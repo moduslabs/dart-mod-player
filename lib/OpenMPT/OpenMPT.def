@@ -1,0 +1,11 @@
+LIBRARY   OpenMPT
+EXPORTS
+   read_directory
+   open_mod_file
+   pause_music
+   play_music
+   stop_music
+   get_mod_info
+   get_mod_position
+   get_pattern
+   get_audio_buffers

@@ -1,0 +1,20 @@
+name: dart_openmpt
+version: 0.0.1
+description: >-
+  A Mod Player library using OpenMPT
+
+# This example isn't intended for publishing on pub.dev.
+publish_to: none
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  ansicolor: ^2.0.1
+  ffi: ^1.0.0
+  path: ^1.8.0
+
+#dev_dependencies:
+#  test: ^1.16.0
+#  test_utils:
+#    path: ../test_utils

@@ -1,0 +1,22 @@
+dart:
+  - dev
+  - stable
+
+os:
+  - linux
+  - macos
+  - ios
+  - android
+#  - windows
+
+stages:
+  - analyze:
+      - dartanalyzer: --fatal-infos .
+        os: linux
+      - dartfmt:
+        os: linux
+        dart: dev
+#  - unit_test:
+#      - test:
+#        os:
+#          - linux

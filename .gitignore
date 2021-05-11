@@ -19,9 +19,36 @@ node_modules
 *.sln
 *.sw*
 
-# Use either yarn.lock or package-lock.json
-# Uncomment one of them to mainain a single lockfile
-# package-lock.json
-# yarn.lock
 
-## Project-specific files
+# Dart Boilerplate ignores
+*.o
+*.dylib
+a.out
+.vscode/
+.packages
+sdk-version
+*snapshot*
+pubspec.lock
+.dart_tool
+
+# Windows
+*.obj
+*.dll
+*.lib
+*.exe
+*.exp
+
+# jetbrains products
+.idea/
+
+# CMake Build dir
+lib/ffi/build
+
+# macOS Junk
+.DS_Store
+
+# Other stuff
+libopenmpt-*
+libopenmpt/   # Where we put our compiled libraries
+libportaudio/ # Where we put our compiled libraries
+portaudio/
