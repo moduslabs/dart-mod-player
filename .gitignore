@@ -47,7 +47,6 @@ lib/ffi/build
 # macOS Junk
 .DS_Store
 
-# Other stuff
-./lib/cpp-lib/  # Where we put our compiled libraries
-./lib/cpp-lib-sources/openmpt/ # Directory that contains source files
-./lib/cpp-lib-sources/portaudio/ # Directory that contains source files
+lib/cpp-lib/ 
+lib/cpp-lib-sources/openmpt/
+lib/cpp-lib-sources/portaudio/ 
