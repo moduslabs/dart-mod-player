@@ -48,7 +48,6 @@ lib/ffi/build
 .DS_Store
 
 # Other stuff
-libopenmpt-*
-libopenmpt/   # Where we put our compiled libraries
-libportaudio/ # Where we put our compiled libraries
-portaudio/
+./lib/cpp-lib/  # Where we put our compiled libraries
+./lib/cpp-lib-sources/openmpt/ # Directory that contains source files
+./lib/cpp-lib-sources/portaudio/ # Directory that contains source files
