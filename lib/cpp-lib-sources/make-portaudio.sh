@@ -1,10 +1,11 @@
+#!/usr/bin/env bash
 
 set -e
 trap 'echo "exit $? due to $previous_command"' EXIT
 
 CPP_LIBRARY="pa_stable_v190700_20210406"
 FRIENDLY_DIR="portaudio"
-LIB_DESTINATION_DIR="`pwd`/../libportaudio"
+LIB_DESTINATION_DIR="`pwd`/../cpp-lib/libportaudio"
 
 mkdir -p ${FRIENDLY_DIR}
 mkdir -p ${LIB_DESTINATION_DIR}
@@ -33,17 +34,20 @@ if [[ ! -d "${CPP_LIBRARY}" ]]; then
   wget -O- http://files.portaudio.com/archives/${CPP_LIBRARY}.tgz | tar xfvz - 
 fi
 
-
 cd ${FRIENDLY_DIR}
 
-./configure --disable-universal 
+if [[ "${machine}" == "Darwin" ]]; then
 
-make -j${NUMPROCS}
+  ./configure --prefix=${LIB_DESTINATION_DIR} --exec-prefix=${LIB_DESTINATION_DIR} \
+              --disable-universal 
 
-# echo "Libs are in ${FRIENDLY_DIR}/lib/.libs"
-# find lib/.libs
+elif [[ "${machine}" == "Linux" ]]; then
+  ./configure --prefix=${LIB_DESTINATION_DIR} --exec-prefix=${LIB_DESTINATION_DIR}
+fi
 
-cd ..
+make -j${NUMPROCS} install
+
+echo "make exit code $?"
 
 
 
