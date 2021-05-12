@@ -48,7 +48,7 @@ lib/ffi/build
 .DS_Store
 *cmake-build-debug*
 *build*
-lib/OpenMPT/dart_openmpt_library.cbp
+lib/OpenMPT/*.cbp
 lib/cpp-lib/ 
 lib/cpp-lib-sources/openmpt/
 lib/cpp-lib-sources/portaudio/ 
