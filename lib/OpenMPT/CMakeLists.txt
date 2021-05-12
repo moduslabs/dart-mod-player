@@ -31,7 +31,7 @@ add_executable(OpenMPT-test ${MY_SOURCES})
 
 ## libopenmpt
 message("--- OpenMPT -----")
-set(OPENMPT_PKG_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib/libopenmpt/lib/pkgconfig")
+set(OPENMPT_PKG_DIR "${CMAKE_SOURCE_DIR}/../lib/libopenmpt/lib/pkgconfig")
 set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH};${OPENMPT_PKG_DIR}")
 message("ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH}")
 pkg_search_module(LIBOPENMPT REQUIRED libopenmpt)
@@ -50,7 +50,7 @@ message("")
 
 ## libportaudio
 message("--- PortAudio2 -----")
-set(PORTAUDIO_PKG_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib/libportaudio/lib/pkgconfig")
+set(PORTAUDIO_PKG_DIR "${CMAKE_SOURCE_DIR}/../lib/libportaudio/lib/pkgconfig")
 set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH};${PORTAUDIO_PKG_DIR}")
 message("ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH}")
 
