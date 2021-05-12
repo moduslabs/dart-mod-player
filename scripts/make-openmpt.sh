@@ -6,7 +6,11 @@ trap 'echo "exit $? due to $previous_command"' EXIT
 
 OPENMPT_LIB="libopenmpt-0.5.8+release.autotools"
 FRIENDLY_DIR="openmpt"
-LIB_DESTINATION_DIR="`pwd`/../cpp-lib/libopenmpt"
+LIB_DESTINATION_DIR="$(pwd)/../lib/lib/libopenmpt"
+mkdir -p $LIB_DESTINATION_DIR
+echo "CPP Library files (shared objects) belong in this directory." > "$(pwd)/../lib/lib/Readme.md"
+
+LIB_DESTINATION_DIR=$(realpath ${LIB_DESTINATION_DIR})
 
 rm -rf ${OPENMPT_LIB} ${FRIENDLY_DIR} 2>/dev/null
 mkdir -p ${LIB_DESTINATION_DIR}
@@ -15,7 +19,7 @@ mkdir -p ${LIB_DESTINATION_DIR}
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
-    Darwin*)    machine=Mac;;
+    Darwin*)    machine=Darwin;;
     CYGWIN*)    machine=Cygwin;;
     MINGW*)     machine=MinGw;;
     *)          machine="UNKNOWN:${unameOut}"
@@ -32,13 +36,10 @@ fi
 
 
 
-if [[ ! -d "${OPENMPT_LIB}" ]]; then
-  wget -O- https://lib.openmpt.org/files/libopenmpt/src/${OPENMPT_LIB}.tar.gz | tar xvfz - 
-  mv ${OPENMPT_LIB} "${FRIENDLY_DIR}/"
-fi
+wget -O- https://lib.openmpt.org/files/libopenmpt/src/${OPENMPT_LIB}.tar.gz | tar xvfz - 
+mv ${OPENMPT_LIB} "${FRIENDLY_DIR}/"
 
 cd ${FRIENDLY_DIR}
-
 
 
 ./configure --without-mpg123 --without-ogg --without-vorbis --without-libsndfile \
@@ -48,4 +49,7 @@ cd ${FRIENDLY_DIR}
 
 
 make -j${NUMPROCS} install
-
+if [[ $? -eq 0 ]]; then
+  cd ..
+  rm -rf ${FRIENDLY_DIR}
+fi
