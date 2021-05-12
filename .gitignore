@@ -47,6 +47,7 @@ lib/ffi/build
 # macOS Junk
 .DS_Store
 
+lib/OpenMPT/dart_openmpt_library.cbp
 lib/cpp-lib/ 
 lib/cpp-lib-sources/openmpt/
 lib/cpp-lib-sources/portaudio/ 

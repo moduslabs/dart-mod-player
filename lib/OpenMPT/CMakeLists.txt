@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
 project(openmpt_library VERSION 1.0.0)
+set(TEST_PROGRAM_NAME OpenMPT-test)
+
+find_package(PkgConfig REQUIRED)
+
+# There HAS to be a better way to do this :(
+set(SO_SUFFIX "so")
+if (APPLE)
+  set(SO_SUFFIX "dylib")
+endif (APPLE)
 
 
 SET(CMAKE_CXX_STANDARD 17)
@@ -21,37 +30,47 @@ add_executable(OpenMPT-test ${MY_SOURCES})
 
 
 ## libopenmpt
-set(OPENMPT_LIB_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib/libopenmpt")
-set(OPENMPT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib-sources/open-mpt")
+message("--- OpenMPT -----")
+set(OPENMPT_PKG_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib/libopenmpt/lib/pkgconfig")
+set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH};${OPENMPT_PKG_DIR}")
+message("ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH}")
+pkg_search_module(LIBOPENMPT REQUIRED libopenmpt)
 
-message("OPENMPT_SOURCE_DIR = ${OPENMPT_SOURCE_DIR}")
-include_directories(${OPENMPT_SOURCE_DIR}/libopenmpt/)
-file(GLOB OPENMPT_LIBRARIES "${OPENMPT_LIB_DIR}/*.dylib")
-message("OPENMPT_LIBRARIES = ${OPENMPT_LIBRARIES}")
-target_link_libraries(OpenMPT-test ${OPENMPT_LIBRARIES})
-target_link_libraries(openmpt_library ${OPENMPT_LIBRARIES})
+
+message("LIBOPENMPT_INCLUDE_DIRS = ${LIBOPENMPT_INCLUDE_DIRS}")
+message("LIBOPENMPT_LIBRARY_DIRS = ${LIBOPENMPT_LIBRARY_DIRS}")
+message("LIBOPENMPT_LDFLAGS = ${LIBOPENMPT_LDFLAGS}")
+
+include_directories(${LIBOPENMPT_INCLUDE_DIRS}/libopenmpt)
+
+target_link_libraries(OpenMPT-test "${LIBOPENMPT_LIBRARY_DIRS}/libopenmpt.${SO_SUFFIX}")
+target_link_libraries(openmpt_library "${LIBOPENMPT_LIBRARY_DIRS}/libopenmpt.${SO_SUFFIX}")
+
+message("")
 
 ## libportaudio
-set(TEST_PROGRAM_NAME OpenMPT-test)
-set(PORTAUDIO_LIB_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib/libportaudio")
-set(PORTAUDIO_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib-sources/portaudio")
-message("PORTAUDIO_SOURCE_DIR = ${PORTAUDIO_SOURCE_DIR}")
-include_directories(${PORTAUDIO_SOURCE_DIR}/include)
-file(GLOB PORTAUDIO_LIBRARIES "${PORTAUDIO_LIB_DIR}/*.dylib")
-message("PORTAUDIO_LIBRARIES = ${PORTAUDIO_LIBRARIES}")
-target_link_libraries(${TEST_PROGRAM_NAME} ${PORTAUDIO_LIBRARIES})
-target_link_libraries(openmpt_library ${PORTAUDIO_LIBRARIES})
+message("--- PortAudio2 -----")
+set(PORTAUDIO_PKG_DIR "${CMAKE_SOURCE_DIR}/../cpp-lib/libportaudio/lib/pkgconfig")
+set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH};${PORTAUDIO_PKG_DIR}")
+message("ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH}")
 
+pkg_search_module(PORTAUDIO REQUIRED portaudio-2.0)
 
-set_target_properties(openmpt_library PROPERTIES
+message("PORTAUDIO_INCLUDE_DIRS = ${PORTAUDIO_INCLUDE_DIRS}")
+message("PORTAUDIO_LDFLAGS = ${PORTAUDIO_LDFLAGS}")
+message("PORTAUDIO_LIBRARY_DIRS = ${PORTAUDIO_LIBRARY_DIRS}")
+
+include_directories(${PORTAUDIO_INCLUDE_DIRS})
+target_link_libraries(OpenMPT-test "${PORTAUDIO_LIBRARY_DIRS}/libportaudio.${SO_SUFFIX}")
+target_link_libraries(openmpt_library "${PORTAUDIO_LIBRARY_DIRS}/libportaudio.${SO_SUFFIX}")
+
+set_target_properties(${PROJECT} PROPERTIES
     PUBLIC_HEADER OpenMpt.h
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
     OUTPUT_NAME "OpenMPT"
     XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Hex_Identity_ID_Goes_Here"
 )
-
-
 
 add_custom_command(
     TARGET ${TEST_PROGRAM_NAME} POST_BUILD

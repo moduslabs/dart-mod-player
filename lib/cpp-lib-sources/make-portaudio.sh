@@ -5,8 +5,9 @@ trap 'echo "exit $? due to $previous_command"' EXIT
 
 CPP_LIBRARY="pa_stable_v190700_20210406"
 FRIENDLY_DIR="portaudio"
-LIB_DESTINATION_DIR="`pwd`/../cpp-lib/libportaudio"
+LIB_DESTINATION_DIR=`realpath $(pwd)/../cpp-lib/libportaudio`
 
+rm -rf ${FRIENDLY_DIR} 2>/dev/null
 mkdir -p ${FRIENDLY_DIR}
 mkdir -p ${LIB_DESTINATION_DIR}
 
@@ -14,7 +15,7 @@ mkdir -p ${LIB_DESTINATION_DIR}
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
-    Darwin*)    machine=Mac;;
+    Darwin*)    machine=Darwin;;
     CYGWIN*)    machine=Cygwin;;
     MINGW*)     machine=MinGw;;
     *)          machine="UNKNOWN:${unameOut}"
@@ -37,10 +38,8 @@ fi
 cd ${FRIENDLY_DIR}
 
 if [[ "${machine}" == "Darwin" ]]; then
-
   ./configure --prefix=${LIB_DESTINATION_DIR} --exec-prefix=${LIB_DESTINATION_DIR} \
               --disable-universal 
-
 elif [[ "${machine}" == "Linux" ]]; then
   ./configure --prefix=${LIB_DESTINATION_DIR} --exec-prefix=${LIB_DESTINATION_DIR}
 fi
