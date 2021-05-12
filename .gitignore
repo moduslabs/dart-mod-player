@@ -44,11 +44,10 @@ pubspec.lock
 # CMake Build dir
 lib/ffi/build
 
-# macOS Junk
+scripts/portaudio
+scripts/openmpt
 .DS_Store
 *cmake-build-debug*
 *build*
 lib/OpenMPT/*.cbp
-lib/cpp-lib/ 
-lib/cpp-lib-sources/openmpt/
-lib/cpp-lib-sources/portaudio/ 
+lib/lib/
