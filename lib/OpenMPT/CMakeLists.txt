@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
-project(openmpt_library VERSION 1.0.0)
+project(openmpt_dart VERSION 1.0.0)
 set(TEST_PROGRAM_NAME OpenMPT-test)
 
 find_package(PkgConfig REQUIRED)
@@ -25,7 +25,7 @@ endif ()
 
 file(GLOB MY_SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 include_directories(${CMAKE_SOURCE_DIR}/src)
-add_library(openmpt_library SHARED ${MY_SOURCES} OpenMPT.def)
+add_library(openmpt_dart SHARED ${MY_SOURCES} OpenMPT.def)
 add_executable(OpenMPT-test ${MY_SOURCES})
 
 
@@ -44,7 +44,7 @@ message("LIBOPENMPT_LDFLAGS = ${LIBOPENMPT_LDFLAGS}")
 include_directories(${LIBOPENMPT_INCLUDE_DIRS}/libopenmpt)
 
 target_link_libraries(OpenMPT-test "${LIBOPENMPT_LIBRARY_DIRS}/libopenmpt.${SO_SUFFIX}")
-target_link_libraries(openmpt_library "${LIBOPENMPT_LIBRARY_DIRS}/libopenmpt.${SO_SUFFIX}")
+target_link_libraries(openmpt_dart "${LIBOPENMPT_LIBRARY_DIRS}/libopenmpt.${SO_SUFFIX}")
 
 message("")
 
@@ -62,7 +62,7 @@ message("PORTAUDIO_LIBRARY_DIRS = ${PORTAUDIO_LIBRARY_DIRS}")
 
 include_directories(${PORTAUDIO_INCLUDE_DIRS})
 target_link_libraries(OpenMPT-test "${PORTAUDIO_LIBRARY_DIRS}/libportaudio.${SO_SUFFIX}")
-target_link_libraries(openmpt_library "${PORTAUDIO_LIBRARY_DIRS}/libportaudio.${SO_SUFFIX}")
+target_link_libraries(openmpt_dart "${PORTAUDIO_LIBRARY_DIRS}/libportaudio.${SO_SUFFIX}")
 
 set_target_properties(${PROJECT} PROPERTIES
     PUBLIC_HEADER OpenMpt.h
