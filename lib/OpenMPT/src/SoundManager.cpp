@@ -1,6 +1,7 @@
 #include "SoundManager.h"
 #include <thread>
 #include <mutex>
+#include <cstring>
 
 static openmpt::module_ext *modFile = nullptr;
 std::mutex mutex;

@@ -159,15 +159,7 @@ struct ArrayOfStrings readDirectory() {
 
 
 int main(int argc, char *argv[]) {
-//  hello_world();
-//  printInt(12345);
-//  printString("This is some string");
-//  printf("Results of getString() is \"%s\"\n", getString());
-//  readDirectory();
-
   if (argc < 2) {
-    // Try to load Dungeon2.xm
-
     printf("Error!! Need a file name.\nExample: ./Openmpt-test MainMenu.xm\n");
     exit(SND_MGR_ERR_NO_FILE_SPECIFIED);
   }
@@ -185,8 +177,6 @@ int main(int argc, char *argv[]) {
 //    SoundManager::GetPattern(0);
     SoundManager::Run();
   }
-
-
   return 0;
 }
 

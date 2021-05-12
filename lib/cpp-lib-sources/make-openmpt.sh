@@ -6,6 +6,8 @@ trap 'echo "exit $? due to $previous_command"' EXIT
 
 OPENMPT_LIB="libopenmpt-0.5.8+release.autotools"
 FRIENDLY_DIR="openmpt"
+mkdir -p $(pwd)/../cpp-lib/libopenmpt
+
 LIB_DESTINATION_DIR=`realpath $(pwd)/../cpp-lib/libopenmpt`
 
 rm -rf ${OPENMPT_LIB} ${FRIENDLY_DIR} 2>/dev/null

@@ -1,15 +1,17 @@
-#!/usr/bin/env bash
+r#!/usr/bin/env bash
 
 set -e
 trap 'echo "exit $? due to $previous_command"' EXIT
 
 CPP_LIBRARY="pa_stable_v190700_20210406"
 FRIENDLY_DIR="portaudio"
+
+mkdir -p $(pwd)/../cpp-lib/libportaudio
+
 LIB_DESTINATION_DIR=`realpath $(pwd)/../cpp-lib/libportaudio`
 
 rm -rf ${FRIENDLY_DIR} 2>/dev/null
 mkdir -p ${FRIENDLY_DIR}
-mkdir -p ${LIB_DESTINATION_DIR}
 
 # https://stackoverflow.com/a/3466183
 unameOut="$(uname -s)"
