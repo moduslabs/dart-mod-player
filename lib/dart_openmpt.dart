@@ -1,5 +1,5 @@
 import 'dart:ffi';
-import 'dart:io' show Directory, Platform, sleep;
+import 'dart:io' show Directory, Platform, sleep, exit;
 import 'package:path/path.dart' as path;
 import 'package:ffi/ffi.dart';
 
@@ -30,17 +30,18 @@ typedef GetAudioBuffers = StereoAudioBuffersNative Function();
 
 
 String LoadLibrary() {
-  String currentPath = Directory.current.path;
 
+  String currentPath = Directory.current.path;
+  print('${currentPath}');
   final String libraryName = 'OpenMPT';
 
-  // Open the dynamic library
-  String libraryPath = path.join(currentPath, '../lib/${libraryName}/build/', 'libOpenMPT.so');
+  // Link shared objects
+  String libraryPath = path.join(currentPath, 'lib/${libraryName}/build/', 'libdartopenmpt.so');
   if (Platform.isMacOS) {
-    libraryPath = path.join(currentPath, '../lib/${libraryName}/build/', 'libOpenMPT.dylib');
+    libraryPath = path.join(currentPath, 'lib/${libraryName}/build/', 'libdartopenmpt.dylib');
   }
   if (Platform.isWindows) {
-    libraryPath = path.join(currentPath, '../lib/${libraryName}/build/', 'Debug', 'libOpenMPT.dll');
+    libraryPath = path.join(currentPath, 'lib/${libraryName}/build/', 'Debug', 'libdartopenmpt.dll');
   }
 
   return libraryPath;

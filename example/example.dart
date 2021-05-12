@@ -95,7 +95,6 @@ void drawBuffers(OpenMpt openMpt) {
 
       int ltIndex = (col * samplesPerDot) +  sampleIdx;
       if (ltIndex > buffers.left_buffer.length - 1) {
-        print("here");
         ltIndex = buffers.left_buffer.length - 1;
       }
 
@@ -139,27 +138,23 @@ void drawBuffers(OpenMpt openMpt) {
       rightChannelY = numRows - 1;
     }
 
-    screenBuffer[rightChannelY][col] = (rightChannelY == leftChannelY) ? purpleDot : rightDot;
+    screenBuffer[rightChannelY][col] = (rightChannelY == leftChannelY && col == col) ? purpleDot : rightDot;
   }
 
 
+  // Print the buffer
   for (int rowNum = 0; rowNum < numRows; rowNum++) {
     print("${screenBuffer[rowNum].join('')}");
-    // print('${rowNum} ${screenBuffer[rowNum]}');
   }
 
-
-  // for (int b = 0; b < buffers.num_items; b++) {
-  // for (int b = 0; b < 10; b++) {
-  //   // print('${buffers.left_buffer.elementAt(b)} || ${buffers.right_buffer.elementAt(b)}');
-  // }
 }
 
-void main(List<String> args) {
+Future<void> main(List<String> args) async {
 
 
+  // This is used for testing only.
   // OpenMpt openMpt = OpenMpt();
-  // openMpt.openModFile('/Users/jgarcia/projects/dart/dart_openmpt/lib/OpenMPT/build/Dungeon2.xm');
+  // openMpt.openModFile('/Users/jgarcia/projects/dart/dart_openmpt/lib/OpenMPT/songs/Dungeon2.xm');
 
 
   if (args.length < 1) {
@@ -172,30 +167,31 @@ void main(List<String> args) {
   openMpt.playMusic();
 
 
+  bool shouldContinue = true;
+
+  //TODO: why doesn't this work?
+  // Catch CTRL+C (Signal Interrupt)
+  // ProcessSignal.sigint.watch().forEach((signal) {
+  //   shouldContinue = false;
+  // });
+
+  // Move Cursor 0,0
   print("\x1B[2J\x1B[0;0H");
-  // print("\x1B[2J");
+
   final Duration posTimer = Duration(milliseconds: 20);
   for (int i = 0; i < 50000000; i++) {
-    drawBuffers(openMpt);
-    sleep(posTimer);
+    if (shouldContinue) {
+      drawBuffers(openMpt);
+      await Future.delayed(posTimer);
+      sleep(posTimer);
+    }
   }
 
 
-  final Duration oneSecond = Duration(seconds:1);
-  print('sleeping ${oneSecond.inSeconds}s...');
-  sleep(oneSecond);
-
-  openMpt.stopMusic();
-  //
-  // openMpt.openModFile(args[1]);
-  // openMpt.playMusic();
-  //
-  // print('sleeping ${oneSecond.inSeconds}s...');
-  // sleep(oneSecond);
 
   openMpt.stopMusic();
 
   openMpt.shutdown();
-
+  Future.error(0);
 }
 
