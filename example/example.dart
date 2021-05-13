@@ -64,8 +64,9 @@ void drawBuffers(OpenMpt openMpt) {
   int idx = 0;
   fiveTrailingPatterns.forEach((String str) {
     if (str.length >= numCols) {
-      fiveTrailingPatterns[idx++] = str.substring(0, numCols);
+      fiveTrailingPatterns[idx] = str.substring(0, numCols);
     }
+    idx++;
   });
 
   prevOrd = pos.current_order;
@@ -82,7 +83,7 @@ void drawBuffers(OpenMpt openMpt) {
 
   //TODO: Investigate reuse versus recreation/destruction everytime
   //      this function is run.
-  
+
   List<List<String>> screenBuffer = [];
   String emptyString = ' ';
 
