@@ -13,10 +13,11 @@ AnsiPen grayPen = new AnsiPen()..gray();
 
 AnsiPen blueBgPen = new AnsiPen()..blue(bg:true);
 
-final leftDot = bluePen('█');
-final rightDot = redPen('█');
-final purpleDot = redPen('█');
-final hyphen = grayPen('─');
+final String leftDot = bluePen('▒');
+final String rightDot = redPen('▒');
+// final String purpleDot = redPen('█');
+final String hyphen = grayPen('─');
+final String pipeChar = grayPen('│');
 // print('col:${col} | row:${rowNum} | yPos:${yPos} | xPos:${xPos} | leftAvg:${leftAverage}');
 //https://www.bbc.co.uk/bitesize/guides/zscvxfr/revision/4
 // ▓ ▒ ░
@@ -27,6 +28,9 @@ List<String> fiveTrailingPatterns = ["","","","",""];
 int prevOrd = -1;
 int prevPat = -1;
 int prevRow = -1;
+int prevColumns = 0;
+int prevRows = 0;
+
 
 void drawBuffers(OpenMpt openMpt) {
   print("\x1B[0;0H"); //clear screen
@@ -34,10 +38,19 @@ void drawBuffers(OpenMpt openMpt) {
   ModPosition pos = openMpt.getModPosition();
   List<List<String>> allPatterns = openMpt.getAllPatterns();
   StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
-  print('Song Title -> ${openMpt.modInfo.title.toDartString()}\n');
 
   int numCols = stdout.terminalColumns - 1,
-      numRows = stdout.terminalLines - 9;
+      numRows = stdout.terminalLines - 10;
+
+  // Clear the screen IF we end up resizing the terminal
+  if (numCols != prevColumns || numRows != prevRows) {
+    print("\x1B[2J\x1B[0;0H");
+  }
+
+  prevColumns = numCols;
+  prevRows = numRows;
+
+  print('Song Title -> ${openMpt.modInfo.title.toDartString()}');
 
   if (pos.current_order != prevOrd || pos.current_pattern != prevPat || pos.current_row != prevRow) {
     // move positions of items
@@ -48,10 +61,16 @@ void drawBuffers(OpenMpt openMpt) {
     fiveTrailingPatterns[4] = allPatterns[pos.current_pattern][pos.current_row];
   }
 
+  int idx = 0;
+  fiveTrailingPatterns.forEach((String str) {
+    if (str.length >= numCols) {
+      fiveTrailingPatterns[idx++] = str.substring(0, numCols);
+    }
+  });
+
   prevOrd = pos.current_order;
   prevPat = pos.current_pattern;
   prevRow = pos.current_row;
-
 
 
   print(fiveTrailingPatterns[0]);
@@ -59,38 +78,44 @@ void drawBuffers(OpenMpt openMpt) {
   print(fiveTrailingPatterns[2]);
   print(fiveTrailingPatterns[3]);
   print(blueBgPen(fiveTrailingPatterns[4]));
+  print('');
 
+  //TODO: Investigate reuse versus recreation/destruction everytime
+  //      this function is run.
+  
   List<List<String>> screenBuffer = [];
   String emptyString = ' ';
-  final int middle = (numRows / 2).floor();
 
-
-  int samplesPerDot = (buffers.num_items / numCols).floor();
+  final int halfY = (numRows / 2).floor();
+  final int halfX = (numCols / 2).floor();
 
 
   // Create memory space to act as a screen buffer
   // (could not figure out a way to do this en mass)
+
   for (int rowNum = 0; rowNum < numRows; rowNum++) {
     List<String> row = [];
     for (int col = 0; col < numCols; col++) {
-      if (rowNum == middle) {
-        row.add('─');
+
+      String str = emptyString;
+      if (rowNum == halfY) {
+        str = hyphen;
       }
-      else {
-        row.add(emptyString);
+      if (col == halfX) {
+        str = pipeChar;
       }
-      // row.add(col.toString());
+      row.add(str);
     }
-    // print("${rowNum} ${row}");
+
     screenBuffer.add(row);
   }
 
+  int samplesPerDot = (buffers.num_items / (numCols / 2)).floor();
 
-  // for (int rowNum = 0; rowNum < numRows; rowNum++) {
-  for (int col = 0; col < numCols; col++) {
+
+  // LEFT channel
+  for (int col = 0; col < halfX; col++) {
     double leftSum = 0;
-    double rightSum = 0;
-
     for (int sampleIdx = 0; sampleIdx < samplesPerDot; sampleIdx++) {
 
       int ltIndex = (col * samplesPerDot) +  sampleIdx;
@@ -102,21 +127,11 @@ void drawBuffers(OpenMpt openMpt) {
       if (leftSum.isNaN){
         leftSum = 0; // Hack
       }
-
-      int rtIndex = (col * samplesPerDot) +  sampleIdx;
-      if (rtIndex > buffers.right_buffer.length - 1) {
-        rtIndex = buffers.right_buffer.length - 1;
-      }
-
-      double rtBufferVal = buffers.right_buffer[rtIndex];
-      rightSum += rtBufferVal;
-      if (rightSum.isNaN){
-        rightSum = 0; // Hack
-      }
     }
 
+
     double leftAverage = leftSum / samplesPerDot;
-    int leftChannelY = middle + (leftAverage * numRows / 2).floor();
+    int leftChannelY = halfY + (leftAverage * numRows / 2).floor();
 
     if (leftChannelY < 0) {
       leftChannelY = 0;
@@ -126,10 +141,28 @@ void drawBuffers(OpenMpt openMpt) {
     }
 
     screenBuffer[leftChannelY][col] = leftDot;
+  }
 
+  // RIGHT channel
+  int pointerColumn = 0;
+  for (int drawCol = halfX + 1; drawCol < numCols - 1; drawCol++) {
+    double rightSum = 0;
+
+    for (int sampleIdx = 0; sampleIdx < samplesPerDot; sampleIdx++) {
+      int rtIndex = (pointerColumn * samplesPerDot) + sampleIdx;
+      if (rtIndex > buffers.right_buffer.length - 1) {
+        rtIndex = buffers.right_buffer.length - 1;
+      }
+
+      double rtBufferVal = buffers.right_buffer[rtIndex];
+      rightSum += rtBufferVal;
+      if (rightSum.isNaN) {
+        rightSum = 0; // Hack
+      }
+    }
 
     double rightAverage = rightSum / samplesPerDot;
-    int rightChannelY = middle + (rightAverage * numRows / 2).floor();
+    int rightChannelY = halfY + (rightAverage * numRows / 2).floor();
 
     if (rightChannelY < 0) {
       rightChannelY = 0;
@@ -138,7 +171,8 @@ void drawBuffers(OpenMpt openMpt) {
       rightChannelY = numRows - 1;
     }
 
-    screenBuffer[rightChannelY][col] = (rightChannelY == leftChannelY && col == col) ? purpleDot : rightDot;
+    screenBuffer[rightChannelY][drawCol] = rightDot;
+    pointerColumn++;
   }
 
 
@@ -178,20 +212,25 @@ Future<void> main(List<String> args) async {
   // Move Cursor 0,0
   print("\x1B[2J\x1B[0;0H");
 
-  final Duration posTimer = Duration(milliseconds: 20);
-  for (int i = 0; i < 50000000; i++) {
+  while (true) {
+
     if (shouldContinue) {
+      final stopwatch = Stopwatch()..start();
       drawBuffers(openMpt);
-      await Future.delayed(posTimer);
-      sleep(posTimer);
+      // print('drawBuffers() executed in ${stopwatch.elapsed.inMilliseconds}');
+      if (stopwatch.elapsed.inMilliseconds < 20) {
+        int diff = 20 - stopwatch.elapsed.inMilliseconds;
+        // sleep ONLY if we need to.
+        if (diff > 0) {
+          sleep(Duration(milliseconds: diff));
+        }
+      }
+
     }
   }
-
-
 
   openMpt.stopMusic();
 
   openMpt.shutdown();
-  Future.error(0);
 }
 

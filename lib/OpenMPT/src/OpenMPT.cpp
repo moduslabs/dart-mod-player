@@ -169,9 +169,10 @@ int main(int argc, char *argv[]) {
     printf("modInfo.title = %s\n", modInfo.title);
     play_music();
 
-    for (int patNum = 0; patNum < modInfo.num_patterns; ++patNum) {
-      SoundManager::GetPattern(patNum);
+//    SoundManager::GetAll
 
+    for (int patNum = 0; patNum < modInfo.num_patterns; ++patNum) {
+       SoundManager::GetPattern(patNum);
     }
 
 //    SoundManager::GetPattern(0);

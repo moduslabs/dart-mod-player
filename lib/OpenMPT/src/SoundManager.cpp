@@ -6,29 +6,22 @@
 static openmpt::module_ext *modFile = nullptr;
 std::mutex mutex;
 
-#define BUFFER_SIZE 1024
+#define NUM_FRAMES 1024
 
 static int playMode = 0; // 0 stopped, 1 playing, 2 paused;
 static double soundVolume = 0; //[ 0 - 200 ];
-
-typedef struct {
-  float left_phase;
-  float right_phase;
-} paTestData;
-
-static paTestData data;
 
 static int currentModData[4];
 
 ModInfo modInfoObject;
 ModPosition modPosition;
-static const int numBuffers = BUFFER_SIZE / 2;
+static const int numLRFrames = NUM_FRAMES / 2;
 
-static float *ltBuffer = (float *) malloc(numBuffers * sizeof (float));
-static float *rtBuffer = (float *) malloc(numBuffers * sizeof (float));
+static float *ltBuffer = (float *) malloc(numLRFrames * sizeof (float));
+static float *rtBuffer = (float *) malloc(numLRFrames * sizeof (float));
 
 
-static const size_t bufferSize =  numBuffers;
+static const size_t bufferSize =  numLRFrames;
 
 
 
@@ -66,10 +59,28 @@ static int static_paStreamCallback(const void *inputBuffer,
 
     auto *outBuff = (float *)outputBuffer;
 
-    for (int i = 0; i < numBuffers; ++i) {
-      ltBuffer[i] = outBuff[i];
-      rtBuffer[i] = outBuff[i+1];
+    int leftRightIndex = 0;
+    for (int i = 0; i < numFrames; i+=2) {
+      ltBuffer[leftRightIndex] = outBuff[i];
+      rtBuffer[leftRightIndex] = outBuff[i+1];
+      leftRightIndex++;
     }
+
+//    size_t index = 0;
+//    for (int i = 0; i < numFrames; ++i) {
+//      for (int c = 0; c < numChannels; c++) {
+//        // 0, 2 == left
+//        // 1, 3 == right
+//        if (c == 1 || c == 3) {
+////        if (c == 0 || c == 2) {
+//          printf("numChannels(%i), i(%i), c(%i), index(%lu)\n", numChannels, i, c, index);
+//          fflush(stdout);
+//
+//          outBuff[index] = 0;
+//        }
+//        index++;
+//      }
+//    }
 
 //    memset(outputBuffer, 0, numFrames * sizeof(outputBuffer));
   }
@@ -89,16 +100,15 @@ static int initializePortAudio() {
   if( err != paNoError ) goto error;
 
   /* Open an audio I/O stream. */
-
   err = Pa_OpenDefaultStream(
       &stream,
-      0,      /* no input channels */
-    2,      /* stereo output */
-    paFloat32,  /* 32 bit floating point output */
-    44100,    // Sample Rate
-    BUFFER_SIZE,    /* frames per buffer */
+      0,              /* no input channels */
+    2,              /* stereo output */
+    paFloat32,      /* 32 bit floating point output */
+    44100,          // Sample Rate
+    NUM_FRAMES,    /* frames per buffer */
     static_paStreamCallback,
-      &data
+      nullptr
   );
 
   if( err != paNoError ) goto error;
@@ -162,8 +172,6 @@ void SoundManager::Run() {
         printf("\n");
       }
 
-//      int orderPattern = modFile->get_order_pattern(currentOrder);
-
 //      for (int i = 0; i < modInfoObject.num_channels; ++i) {
 //        printf("%s",  modFile->format_pattern_row_channel(currentPattern, currentRow, i, 0, true).c_str());
 //        if (i < modInfoObject.num_channels) {
@@ -171,7 +179,6 @@ void SoundManager::Run() {
 //        }
 //      }
 //      printf("\n");
-//      char *rowString  =
     }
 
     mutex.unlock();
@@ -199,9 +206,9 @@ ModPosition SoundManager::GetModPosition() {
 StereoAudioBuffers SoundManager::GetStereoAudioBuffers() {
   StereoAudioBuffers buffers = {};
 
-  buffers.numItems = numBuffers;
-  buffers.left_buffer = (double*)malloc(numBuffers * sizeof(double));
-  buffers.right_buffer = (double*)malloc(numBuffers * sizeof(double));
+  buffers.numItems = numLRFrames;
+  buffers.left_buffer = (double*)malloc(numLRFrames * sizeof(double));
+  buffers.right_buffer = (double*)malloc(numLRFrames * sizeof(double));
 
   mutex.lock();
   for (int i = 0; i < bufferSize; ++i) {
