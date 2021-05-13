@@ -37,17 +37,19 @@ void drawBuffers(OpenMpt openMpt) {
   ModPosition pos = openMpt.getModPosition();
   List<List<String>> allPatterns = openMpt.getAllPatterns();
   StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
-  print('Song Title -> ${openMpt.modInfo.title.toDartString()}\n');
 
   int numCols = stdout.terminalColumns - 1,
-      numRows = stdout.terminalLines - 9;
+      numRows = stdout.terminalLines - 10;
 
-  // Clear the screen IF we end up not
+  // Clear the screen IF we end up resizing the terminal
   if (numCols != prevColumns || numRows != prevRows) {
     print("\x1B[2J\x1B[0;0H");
   }
 
+  prevColumns = numCols;
+  prevRows = numRows;
 
+  print('Song Title -> ${openMpt.modInfo.title.toDartString()}');
 
   if (pos.current_order != prevOrd || pos.current_pattern != prevPat || pos.current_row != prevRow) {
     // move positions of items
@@ -70,13 +72,13 @@ void drawBuffers(OpenMpt openMpt) {
   prevRow = pos.current_row;
 
 
-
   print(fiveTrailingPatterns[0]);
   print(fiveTrailingPatterns[1]);
   print(fiveTrailingPatterns[2]);
   print(fiveTrailingPatterns[3]);
   print(blueBgPen(fiveTrailingPatterns[4]));
   print('');
+  
   List<List<String>> screenBuffer = [];
   String emptyString = ' ';
 
@@ -205,12 +207,20 @@ Future<void> main(List<String> args) async {
   // Move Cursor 0,0
   print("\x1B[2J\x1B[0;0H");
 
-  final Duration posTimer = Duration(milliseconds: 20);
   while (true) {
+
     if (shouldContinue) {
+      final stopwatch = Stopwatch()..start();
       drawBuffers(openMpt);
-      await Future.delayed(posTimer);
-      sleep(posTimer);
+      // print('drawBuffers() executed in ${stopwatch.elapsed.inMilliseconds}');
+      if (stopwatch.elapsed.inMilliseconds < 20) {
+        int diff = 20 - stopwatch.elapsed.inMilliseconds;
+        // sleep ONLY if we need to.
+        if (diff > 0) {
+          sleep(Duration(milliseconds: diff));
+        }
+      }
+
     }
   }
 
