@@ -13,10 +13,11 @@ AnsiPen grayPen = new AnsiPen()..gray();
 
 AnsiPen blueBgPen = new AnsiPen()..blue(bg:true);
 
-final leftDot = bluePen('█');
-final rightDot = redPen('█');
-final purpleDot = redPen('█');
-final hyphen = grayPen('─');
+final String leftDot = bluePen('▒');
+final String rightDot = redPen('▒');
+// final String purpleDot = redPen('█');
+final String hyphen = grayPen('─');
+final String pipeChar = grayPen('│');
 // print('col:${col} | row:${rowNum} | yPos:${yPos} | xPos:${xPos} | leftAvg:${leftAverage}');
 //https://www.bbc.co.uk/bitesize/guides/zscvxfr/revision/4
 // ▓ ▒ ░
@@ -78,6 +79,9 @@ void drawBuffers(OpenMpt openMpt) {
   print(fiveTrailingPatterns[3]);
   print(blueBgPen(fiveTrailingPatterns[4]));
   print('');
+
+  //TODO: Investigate reuse versus recreation/destruction everytime
+  //      this function is run.
   
   List<List<String>> screenBuffer = [];
   String emptyString = ' ';
@@ -88,6 +92,7 @@ void drawBuffers(OpenMpt openMpt) {
 
   // Create memory space to act as a screen buffer
   // (could not figure out a way to do this en mass)
+
   for (int rowNum = 0; rowNum < numRows; rowNum++) {
     List<String> row = [];
     for (int col = 0; col < numCols; col++) {
@@ -97,7 +102,7 @@ void drawBuffers(OpenMpt openMpt) {
         str = hyphen;
       }
       if (col == halfX) {
-        str = '│';
+        str = pipeChar;
       }
       row.add(str);
     }
