@@ -216,8 +216,6 @@ StereoAudioBuffers SoundManager::GetStereoAudioBuffers() {
     buffers.left_buffer[i] = ltBuffer[i];
     buffers.right_buffer[i] = rtBuffer[i];
   }
-//  memcpy(buffers.left_buffer, ltBuffer, bufferSize);
-//  memcpy(buffers.right_buffer, rtBuffer, bufferSize);
   mutex.unlock();
 
   return buffers;
@@ -258,7 +256,6 @@ int SoundManager::LoadFile(char * filePath) {
 }
 
 ArrayOfStrings SoundManager::GetPattern(int patternNum) {
-//  printf("%s %i\n", __PRETTY_FUNCTION__ , patternNum);
 
   ArrayOfStrings strings = {};
   strings.numItems = modFile->get_pattern_num_rows(patternNum);
