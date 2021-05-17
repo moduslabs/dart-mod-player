@@ -25,7 +25,7 @@ The following _assumes_ you have the following dependencies installed:
 - git
 
 For Linux:
-- libsndfile-dev
+- libsndfile-dev libasound-dev
 
 ```bash
 # Clone this repo: 
