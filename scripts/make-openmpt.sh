@@ -42,8 +42,8 @@ mv ${OPENMPT_LIB} "${FRIENDLY_DIR}/"
 cd ${FRIENDLY_DIR}
 
 
-./configure --without-mpg123 --without-ogg --without-vorbis --without-libsndfile \
-    --without-vorbisfile --without-portaudio --without-portaudiocpp \
+./configure --without-mpg123 --without-ogg --without-vorbis --without-sndfile \
+    --without-vorbisfile --without-portaudio --without-portaudiocpp --without-pulseaudio \
     --without-flac --disable-doxygen-doc --disable-doxygen-html --disable-examples --disable-tests \
     --prefix=${LIB_DESTINATION_DIR} --exec-prefix=${LIB_DESTINATION_DIR}
 
