@@ -141,7 +141,7 @@ void SoundManager::UnlockMutex() {
 
 
 ModPosition SoundManager::GetModPosition() {
-  mutex.lock();
+  LockMutex();
 
   ModPosition position = {
     .current_order = (int)modFile->get_current_order(),
@@ -150,7 +150,7 @@ ModPosition SoundManager::GetModPosition() {
     .current_num_rows = (int)modFile->get_pattern_num_rows((int)modFile->get_current_pattern())
   };
 
-  mutex.unlock();
+  UnlockMutex();
   return position;
 }
 
@@ -334,27 +334,20 @@ void SoundManager::SetModPosition(int order) {
 };
 
 int SoundManager::Pause() {
-  mutex.lock();
-
   currentPlayMode = PLAY_MODE_PAUSED;
   int result = Pa_StopStream(stream);
-  mutex.unlock();
   return result;
 }
 
 int SoundManager::Play() {
-  mutex.lock();
   int result = Pa_StartStream(stream);
-  mutex.unlock();
   currentPlayMode = PLAY_MODE_PLAYING;
   return result;
 }
 
 int SoundManager::Stop() {
-  mutex.lock();
   int result = Pa_StopStream(stream);
   currentPlayMode = PLAY_MODE_STOPPED;
-  mutex.unlock();
   return result;
 }
 

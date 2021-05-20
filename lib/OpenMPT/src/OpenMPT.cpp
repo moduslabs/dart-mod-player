@@ -33,7 +33,6 @@ int open_mod_file(char *filePath) {
 
 
 int play_music() {
-  printf("%s\n", __PRETTY_FUNCTION__ );
   return SoundManager::Play();
 }
 

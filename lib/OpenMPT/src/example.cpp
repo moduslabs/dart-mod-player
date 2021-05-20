@@ -1,6 +1,11 @@
 #include <cstdlib>
 #include <cstdio>
 
+#ifdef __linux__
+#include <csignal>
+#endif
+
+
 #include "SoundManager.h"
 #include "OpenMPT.h"
 
@@ -37,7 +42,6 @@ void run() {
       ArrayOfStrings pattern = SoundManager::GetPattern(currPattern);
       printf("%s\n", pattern.items[currRow]);
       pattern.destroy();
-
     }
 
     usleep(5000);
@@ -80,7 +84,7 @@ int main(int argc, char *argv[]) {
   run();
 
   SoundManager::Stop();
-  result =   SoundManager::ShutDown();
+  result = SoundManager::ShutDown();
   return result;
 }
 
