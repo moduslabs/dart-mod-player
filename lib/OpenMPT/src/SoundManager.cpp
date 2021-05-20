@@ -8,10 +8,16 @@ std::mutex mutex;
 
 #define NUM_FRAMES 1024
 
-static int playMode = 0; // 0 stopped, 1 playing, 2 paused;
+
+
 static double soundVolume = 0; //[ 0 - 200 ];
 
-static int currentModData[4];
+static int currentModPattern = -1;
+static int currentModOrder = -1;
+static int currentModRow = -1;
+static int currentModPosition = -1;
+static int currentNumRows = -1;
+static int currentPlayMode = -1;
 
 ModInfo modInfoObject;
 ModPosition modPosition;
@@ -30,7 +36,7 @@ static int static_paStreamCallback(const void *inputBuffer,
                                    unsigned long numFrames,
                                    const PaStreamCallbackTimeInfo* timeInfo,
                                    PaStreamCallbackFlags statusFlags,
-                                   void *userData )  {
+                                   void *userData)  {
 
   /* Prevent unused variable warning. */
   (void) inputBuffer;
@@ -52,37 +58,22 @@ static int static_paStreamCallback(const void *inputBuffer,
 
     mutex.lock();
 
-    currentModData[0] = (int)modFile->get_current_order();
-    currentModData[1] = (int)modFile->get_current_pattern();
-    currentModData[2] = (int)modFile->get_current_row();
-    currentModData[3] = (int)modFile->get_pattern_num_rows(currentModData[1]);
+
+    SoundManager::currentOrder = (int)modFile->get_current_order();
+    SoundManager::currentPattern = (int)modFile->get_current_pattern();
+    SoundManager::currentRow = (int)modFile->get_current_row();
+    SoundManager::currentNumRows = (int)modFile->get_pattern_num_rows(currentModPattern);
 
     auto *outBuff = (float *)outputBuffer;
 
-    int leftRightIndex = 0;
+    // Copy data from
+    int index = 0;
     for (int i = 0; i < numFrames; i+=2) {
-      ltBuffer[leftRightIndex] = outBuff[i];
-      rtBuffer[leftRightIndex] = outBuff[i+1];
-      leftRightIndex++;
+      ltBuffer[index] = outBuff[i];
+      rtBuffer[index] = outBuff[i+1];
+      index++;
     }
 
-//    size_t index = 0;
-//    for (int i = 0; i < numFrames; ++i) {
-//      for (int c = 0; c < numChannels; c++) {
-//        // 0, 2 == left
-//        // 1, 3 == right
-//        if (c == 1 || c == 3) {
-////        if (c == 0 || c == 2) {
-//          printf("numChannels(%i), i(%i), c(%i), index(%lu)\n", numChannels, i, c, index);
-//          fflush(stdout);
-//
-//          outBuff[index] = 0;
-//        }
-//        index++;
-//      }
-//    }
-
-//    memset(outputBuffer, 0, numFrames * sizeof(outputBuffer));
   }
 
   mutex.unlock();
@@ -95,99 +86,58 @@ static PaStream *stream;
 static int initializePortAudio() {
   PaError err;
 
-
   err = Pa_Initialize();
   if( err != paNoError ) goto error;
 
   /* Open an audio I/O stream. */
   err = Pa_OpenDefaultStream(
-      &stream,
-      0,              /* no input channels */
-    2,              /* stereo output */
-    paFloat32,      /* 32 bit floating point output */
-    44100,          // Sample Rate
-    NUM_FRAMES,    /* frames per buffer */
+    &stream,
+    0,                /* no input channels */
+    2,                /* stereo output */
+    paFloat32,        /* 32 bit floating point output */
+    44100,            /* Sample Rate */
+    NUM_FRAMES,       /* frames per buffer */
     static_paStreamCallback,
-      nullptr
+    nullptr
   );
 
   if( err != paNoError ) goto error;
 
   return err;
 
-error:
-  Pa_Terminate();
-  fprintf(stderr, "An error occured while using the portaudio stream\n");
-  fprintf(stderr, "Error number: %d\n", err);
-  fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
-  return err;
+  error:
+    Pa_Terminate();
+    fprintf(stderr, "An error occurred while using the portaudio stream\n");
+    fprintf(stderr, "Error number: %d\n", err);
+    fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+    return err;
 }
 
 
 int SoundManager::currentOrder = -1;
 int SoundManager::currentPattern = -1;
 int SoundManager::currentRow = -1;
+int SoundManager::currentNumRows = -1;
+int SoundManager::currentPlayMode = -1;
 
 int SoundManager::InitSound() {
   currentOrder = -1,
   currentPattern = -1,
   currentRow = -1;
+  currentNumRows = -1;
+  currentPlayMode = PLAY_MODE_STOPPED;
 
   fflush(stdout);
   return initializePortAudio();
 }
 
-
-void SoundManager::Run() {
-
+void SoundManager::LockMutex() {
   mutex.lock();
-
-  currentModData[0] = -1;
-  currentModData[1] = -1;
-  currentModData[2] = -1;
-  currentModData[3] = -1;
-
-  mutex.unlock();
-
-  int prevOrder = 0;
-
-  while (playMode > 0 && modFile) {
-    SoundManager::GetStereoAudioBuffers();
-    mutex.lock();
-
-    if (currentOrder != currentModData[0] || currentPattern != currentModData[1] || currentRow != currentModData[2]) {
-//      printf("Order %i -- Pattern %i -- Row %i\n", currentOrder, currentPattern, currentRow);
-
-
-      currentOrder   = currentModData[0];
-      currentPattern = currentModData[1];
-      currentRow     = currentModData[2];
-
-      modPosition.current_order = currentOrder;
-      modPosition.current_pattern = currentPattern;
-      modPosition.current_row = currentRow;
-
-      if (currentOrder != prevOrder) {
-        prevOrder = currentOrder;
-        printf("\n");
-      }
-
-//      for (int i = 0; i < modInfoObject.num_channels; ++i) {
-//        printf("%s",  modFile->format_pattern_row_channel(currentPattern, currentRow, i, 0, true).c_str());
-//        if (i < modInfoObject.num_channels) {
-//          printf("|");
-//        }
-//      }
-//      printf("\n");
-    }
-
-    mutex.unlock();
-    usleep(5000);
-  }
-
-  SoundManager::Stop();
 }
 
+void SoundManager::UnlockMutex() {
+  mutex.unlock();
+}
 
 
 ModPosition SoundManager::GetModPosition() {
@@ -196,7 +146,8 @@ ModPosition SoundManager::GetModPosition() {
   ModPosition position = {
     .current_order = (int)modFile->get_current_order(),
     .current_pattern = (int)modFile->get_current_pattern(),
-    .current_row = (int)modFile->get_current_row()
+    .current_row = (int)modFile->get_current_row(),
+    .current_num_rows = (int)modFile->get_pattern_num_rows((int)modFile->get_current_pattern())
   };
 
   mutex.unlock();
@@ -212,7 +163,6 @@ StereoAudioBuffers SoundManager::GetStereoAudioBuffers() {
 
   mutex.lock();
   for (int i = 0; i < bufferSize; ++i) {
-//    printf("%i (%lu) | %5f\n", i, bufferSize, ltBuffer[i]);fflush(stdout);
     buffers.left_buffer[i] = ltBuffer[i];
     buffers.right_buffer[i] = rtBuffer[i];
   }
@@ -233,10 +183,13 @@ int SoundManager::LoadFile(char * filePath) {
     static openmpt::module_ext *newModFile = nullptr;
 
     newModFile = new openmpt::module_ext(file);
+
     // Todo:: Setup as a configuration option from the UI
     newModFile->set_repeat_count(999999);
     newModFile->set_render_param(3, 1);
-    openmpt::ext::interactive *interactive = static_cast<openmpt::ext::interactive *>(newModFile->get_interface(openmpt::ext::interactive_id));
+
+    openmpt::ext::interactive *interactive =
+        static_cast<openmpt::ext::interactive *>(newModFile->get_interface(openmpt::ext::interactive_id));
 
     interactive->set_global_volume(1);
 
@@ -262,32 +215,31 @@ ArrayOfStrings SoundManager::GetPattern(int patternNum) {
   strings.items = (char**)malloc(strings.numItems * sizeof(char *));
 
 
-  for (int currentRow = 0; currentRow < strings.numItems; ++currentRow) {
+  for (int row = 0; row < strings.numItems; ++row) {
     std::string rowString;
 
     for (int i = 0; i < modInfoObject.num_channels; ++i) {
-      rowString = rowString.append(modFile->format_pattern_row_channel(patternNum, currentRow, i, 0, true));
+      rowString = rowString.append(modFile->format_pattern_row_channel(patternNum, row, i, 0, true));
       if (i < modInfoObject.num_channels - 1) {
         rowString = rowString.append("|");
       }
     }
 
-    strings.items[currentRow] = (char*)malloc(rowString.length() * sizeof (char*) + 1 );
-    strcpy(strings.items[currentRow], rowString.c_str());
+    strings.items[row] = (char*)malloc(rowString.length() * sizeof (char*) + 1 );
+    strcpy(strings.items[row], rowString.c_str());
 
-//    printf("Row: %i -- %s \n", currentRow, rowString.c_str());
-//    std::string rowNum = std::to_string(currentRow);
-//    if (currentRow < 10) {
+//    printf("Row: %i -- %s \n", row, rowString.c_str());
+//    std::string rowNum = std::to_string(row);
+//    if (row < 10) {
 //      rowNum.insert(0, 1, '0');
 //    }
-//    printf("R: %s : %s \n", rowNum.c_str(), strings.items[currentRow]);
+//    printf("R: %s : %s \n", rowNum.c_str(), strings.items[row]);
   }
 
   return strings;
 }
 
 ModInfo SoundManager::GetModInfo() {
-//  printf("%s\n", __PRETTY_FUNCTION__ );
 
   char *title =  (char*)modFile->get_metadata("title").c_str();
   if (modInfoObject.title != nullptr) {
@@ -381,33 +333,33 @@ void SoundManager::SetModPosition(int order) {
   mutex.unlock();
 };
 
-void SoundManager::Pause() {
+int SoundManager::Pause() {
   mutex.lock();
 
-  playMode = 2;
-  Pa_StopStream(stream);
-
+  currentPlayMode = PLAY_MODE_PAUSED;
+  int result = Pa_StopStream(stream);
   mutex.unlock();
+  return result;
 }
 
-void SoundManager::Play() {
+int SoundManager::Play() {
   mutex.lock();
-  playMode = 1;
-
   int result = Pa_StartStream(stream);
-  printf("Pa_StartStream result = %i\n", result);
   mutex.unlock();
+  currentPlayMode = PLAY_MODE_PLAYING;
+  return result;
 }
 
-void SoundManager::Stop() {
+int SoundManager::Stop() {
   mutex.lock();
-  playMode = 0;
-  Pa_StopStream(stream);
+  int result = Pa_StopStream(stream);
+  currentPlayMode = PLAY_MODE_STOPPED;
   mutex.unlock();
+  return result;
 }
 
 void SoundManager::SetVolume(int newVolume) {
-  if (newVolume == 0) {
+  if (newVolume <= 0) {
     soundVolume = 0;
     return;
   }
@@ -416,16 +368,19 @@ void SoundManager::SetVolume(int newVolume) {
 
   if (modFile != nullptr) {
     openmpt::ext::interactive *interactive = static_cast<openmpt::ext::interactive *>( modFile->get_interface( openmpt::ext::interactive_id ) );
-//    interactive->set_global_volume((double)globalStateObject->getState("volume").toInt() * 0.01f);
+    interactive->set_global_volume((double)newVolume * 0.01f);
   }
 }
 
+bool SoundManager::IsLoaded() {
+  return modFile != nullptr;
+}
 
-void SoundManager::ShutDown() {
+int SoundManager::ShutDown() {
   Stop();
   usleep(100);
   delete modFile;
-  Pa_CloseStream(stream);
+  int result = Pa_CloseStream(stream);
 
   delete ltBuffer;
   delete rtBuffer;
@@ -441,4 +396,5 @@ void SoundManager::ShutDown() {
   if (modInfoObject.date != nullptr) free(modInfoObject.date);
   if (modInfoObject.message != nullptr) free(modInfoObject.message);
   if (modInfoObject.warnings != nullptr) free(modInfoObject.warnings);
+  return result;
 }

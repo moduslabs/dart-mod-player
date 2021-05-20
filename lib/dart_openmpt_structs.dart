@@ -37,6 +37,8 @@ class ModPosition extends Struct {
   external int current_pattern;
   @Int32()
   external int current_row;
+  @Int32()
+  external int current_num_rows;
 }
 
 class ModInfo extends Struct {

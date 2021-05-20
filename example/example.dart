@@ -13,9 +13,8 @@ AnsiPen grayPen = new AnsiPen()..gray();
 
 AnsiPen blueBgPen = new AnsiPen()..blue(bg:true);
 
-final String leftDot = bluePen('▒');
-final String rightDot = redPen('▒');
-// final String purpleDot = redPen('█');
+final String leftDot = bluePen('▓');
+final String rightDot = redPen('▓');
 final String hyphen = grayPen('─');
 final String pipeChar = grayPen('│');
 // print('col:${col} | row:${rowNum} | yPos:${yPos} | xPos:${xPos} | leftAvg:${leftAverage}');
@@ -185,8 +184,6 @@ void drawBuffers(OpenMpt openMpt) {
 }
 
 Future<void> main(List<String> args) async {
-
-
   // This is used for testing only.
   // OpenMpt openMpt = OpenMpt();
   // openMpt.openModFile('/Users/jgarcia/projects/dart/dart_openmpt/lib/OpenMPT/songs/Dungeon2.xm');
