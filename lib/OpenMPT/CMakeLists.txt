@@ -75,7 +75,7 @@ set_target_properties(${PROJECT} PROPERTIES
 add_custom_command(
     TARGET ${TEST_PROGRAM_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_SOURCE_DIR}/songs/*.xm
+    ${CMAKE_SOURCE_DIR}/../../songs/*.xm
     ${CMAKE_CURRENT_BINARY_DIR}/
 )
 

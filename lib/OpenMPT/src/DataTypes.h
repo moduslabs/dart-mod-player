@@ -6,6 +6,13 @@
 struct ArrayOfStrings {
   int32_t numItems;
   char **items;
+  void destroy() const {
+    if (numItems) {
+      for (int i = 0; i < numItems; ++i) {
+        free(items[i]);
+      }
+    }
+  }
 };
 
 struct ArrayOfInt32s {
@@ -28,6 +35,7 @@ struct ModPosition {
   int32_t current_order;
   int32_t current_pattern;
   int32_t current_row;
+  int32_t current_num_rows;
 };
 
 struct ModInfo {

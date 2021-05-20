@@ -3,20 +3,21 @@ import 'dart:io' show Directory, Platform, sleep, exit;
 import 'package:path/path.dart' as path;
 import 'package:ffi/ffi.dart';
 
+
 import 'dart_openmpt_structs.dart';
 
 
-typedef openModFile_native = Void Function(Pointer<Utf8> str);
-typedef OpenModFile = void Function(Pointer<Utf8> str);
+typedef openModFile_native = Int32 Function(Pointer<Utf8> str);
+typedef OpenModFile = int Function(Pointer<Utf8> str);
 
-typedef play_music_native = Void Function();
-typedef PlayMusic = void Function();
+typedef play_music_native = Int32 Function();
+typedef PlayMusic = int Function();
 
-typedef stop_music_native = Void Function();
-typedef StopMusic = void Function();
+typedef stop_music_native = Int32 Function();
+typedef StopMusic = int Function();
 
-typedef shutdown_native = Void Function();
-typedef Shutdown = void Function();
+typedef shutdown_native = Int32 Function();
+typedef Shutdown = int Function();
 
 typedef get_mod_info_native = ModInfo Function();
 
@@ -32,7 +33,6 @@ typedef GetAudioBuffers = StereoAudioBuffersNative Function();
 String LoadLibrary() {
 
   String currentPath = Directory.current.path;
-  print('${currentPath}');
   final String libraryName = 'OpenMPT';
 
   // Link shared objects
@@ -89,8 +89,6 @@ class OpenMpt extends Object {
 
     for (int i = 0; i < patternStrings.numItems; i++) {
       pattern.add(patternStrings.items[i].toDartString());
-      // String rowNum = (i < 10) ? '0${i}' : '${i}';
-      // print('${rowNum} : ${patternStrings.items[i].toDartString()}');
     }
 
     return pattern;
@@ -136,7 +134,6 @@ class OpenMpt extends Object {
   }
 
   OpenMpt() {
-    print('$this() constructor called');
   }
 
   void printModInfo() {

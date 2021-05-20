@@ -10,36 +10,46 @@
 #include <portaudio.h>
 #include <unistd.h>
 
-enum SNDMGR_ERROR_CODES {
+enum SOUND_MANAGER_ERROR_CODES {
   SND_MGR_NO_ERROR,
   SND_MGR_ERR_INIT_AUDIO,
   SND_MGR_ERR_LOAD_FILE,
   SND_MGR_ERR_NO_FILE_SPECIFIED
 };
 
-
+enum PlayMode {
+  PLAY_MODE_STOPPED,
+  PLAY_MODE_PLAYING,
+  PLAY_MODE_PAUSED
+};
 
 class SoundManager {
 
 
 public:
 
+  static int currentPlayMode;
   static int currentOrder;
   static int currentPattern;
   static int currentRow;
+  static int currentNumRows;
 
 
 //  explicit SoundManager();
 //  ~SoundManager();
 
   static int InitSound();
-  static void ShutDown();
+  static int ShutDown();
 
-  static void Run(); // For the thread
+  static int Pause();
+  static int Play();
+  static int Stop();
 
-  static void Pause();
-  static void Play();
-  static void Stop();
+  static void LockMutex();
+  static void UnlockMutex();
+
+  static bool IsLoaded();
+
 
   static int LoadFile(char *filePath);
   static ModInfo GetModInfo();
@@ -60,10 +70,6 @@ public:
     return currentRow;
   }
 
-//public slots:
-
-//signals:
-//  void modPositionChanged(QJsonObject *modInfoObject);
 };
 
 
