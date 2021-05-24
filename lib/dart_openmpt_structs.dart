@@ -1,6 +1,9 @@
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 
+// This file contains the class definitions used to convert C data structures
+// to Dart data structures.
+
 class ArrayOfInt32s extends Struct {
   @Int32()
   external int numItems;
@@ -37,6 +40,8 @@ class ModPosition extends Struct {
   external int current_pattern;
   @Int32()
   external int current_row;
+  @Int32()
+  external int current_num_rows;
 }
 
 class ModInfo extends Struct {
