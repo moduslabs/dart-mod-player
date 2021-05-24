@@ -29,24 +29,28 @@ For Linux:
 
 ```bash
 # Clone this repo:
-git clone https://github.com/moduslabs/dart-mod-player-experiment.git
-
-# Build dependent libraries
-cd dart-mod-player-experiment/scripts/
-bash make-openmpt.sh
-bash make-portaudio.sh
+git clone https://github.com/moduslabs/dart-mod-player.git
 
 # Grab dart dependencis
-cd dart-mod-player-experiment/
+cd dart-mod-player
 dart pub get
 
+# Build dependent libraries
+cd scripts/
+bash make-openmpt.sh
+bash make-portaudio.sh
+cd ..
+
+
 # Build the internal CPP library
-cd dart-mod-player-experiment/lib/OpenMPT/
+cd lib/OpenMPT/
 bash make-library.sh
+cd ../..
 
 # Run the experiment (from project root)
-dart example/example.dart lib/OpenMPT/songs/Main_Menu.xm
+dart mod-player.dart lib/OpenMPT/songs/Main_Menu.xm
 
+# Hit CTRL + C to exit.
 ```
 
 # How it works
