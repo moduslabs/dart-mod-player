@@ -208,12 +208,28 @@ int SoundManager::LoadFile(char * filePath) {
 
 ArrayOfStrings SoundManager::GetPattern(int patternNum) {
 
-  ArrayOfStrings strings = {};
-  strings.numItems = modFile->get_pattern_num_rows(patternNum);
-  strings.items = (char**)malloc(strings.numItems * sizeof(char *));
+  int numItems = modFile->get_pattern_num_rows(patternNum);;
+  ArrayOfStrings strings; // Use new / delete over static creation
+  strings.InitializeWithNumItems(numItems);
+//  strings.items = (char**)malloc(strings.numItems * sizeof(char *));
 
 
-  for (int row = 0; row < strings.numItems; ++row) {
+//  for (int row = 0; row < strings.numItems; ++row) {
+//    std::string rowString;
+//
+//    for (int i = 0; i < modInfoObject.num_channels; ++i) {
+//      rowString = rowString.append(modFile->format_pattern_row_channel(patternNum, row, i, 0, true));
+//      if (i < modInfoObject.num_channels - 1) {
+//        rowString = rowString.append("|");
+//      }
+//    }
+//
+//    strings.items[row] = (char*)malloc(rowString.length() * sizeof (char*) + 1 );
+//    strcpy(strings.items[row], rowString.c_str());
+//  }
+
+
+  for (int row = 0; row < numItems; ++row) {
     std::string rowString;
 
     for (int i = 0; i < modInfoObject.num_channels; ++i) {
@@ -223,10 +239,8 @@ ArrayOfStrings SoundManager::GetPattern(int patternNum) {
       }
     }
 
-    strings.items[row] = (char*)malloc(rowString.length() * sizeof (char*) + 1 );
-    strcpy(strings.items[row], rowString.c_str());
+    strings.addItem(rowString.c_str(), row);
   }
-
   return strings;
 }
 

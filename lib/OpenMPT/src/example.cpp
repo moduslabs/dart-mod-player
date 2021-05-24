@@ -40,9 +40,11 @@ void run() {
         prevOrder = currOrder;
       }
 
+      // Holistically, this is wasteful, but it gives us an opportunity
+      // to exercise SoundManager::GetPattern();
       ArrayOfStrings pattern = SoundManager::GetPattern(currPattern);
       printf("%s\n", pattern.items[currRow]);
-      pattern.destroy();
+      pattern.free();
     }
 
     usleep(5000);

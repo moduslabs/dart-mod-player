@@ -6,12 +6,30 @@
 struct ArrayOfStrings {
   int32_t numItems;
   char **items;
-  void destroy() const {
-    if (numItems) {
-      for (int i = 0; i < numItems; ++i) {
-        free(items[i]);
-      }
+
+  // Constructor, sets all of the items to null
+  // takes in numItems
+
+  // Create add method that appends
+
+  void InitializeWithNumItems (int num_items)  {
+    numItems = num_items;
+
+    items = new char*[numItems];
+    for (int i = 0; i < numItems; ++i) {
+      items[i] = nullptr;
     }
+  }
+
+  void free() const {
+    for (int i = 0; i < numItems; ++i) {
+      delete[] items[i];
+    }
+  }
+
+  void addItem(const char *item, int index) const {
+    items[index] = new char[strlen(item) + 1];
+    strcpy(items[index], item);
   }
 };
 
