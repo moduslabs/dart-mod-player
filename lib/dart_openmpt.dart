@@ -6,7 +6,7 @@ import 'package:ffi/ffi.dart';
 
 import 'dart_openmpt_structs.dart';
 
-
+// Create the function type definitions
 typedef openModFile_native = Int32 Function(Pointer<Utf8> str);
 typedef OpenModFile = int Function(Pointer<Utf8> str);
 
@@ -30,6 +30,7 @@ typedef get_audio_buffers_native = StereoAudioBuffersNative Function();
 typedef GetAudioBuffers = StereoAudioBuffersNative Function();
 
 
+// Load the compiled CPP Library
 String LoadLibrary() {
 
   String currentPath = Directory.current.path;
@@ -47,6 +48,7 @@ String LoadLibrary() {
   return libraryPath;
 }
 
+// Load the compiled (shared) CPP Libraries
 String libraryPath = LoadLibrary();
 
 
@@ -55,6 +57,7 @@ class OpenMpt extends Object {
   ModInfo modInfo = ModInfo();
   List<List<String>> allPatterns = [[]];
 
+  // Opens a Mod file via shared Library function
   void openModFile(String file) {
     final OpenModFile openModFileC = dyLib.lookup<NativeFunction<openModFile_native>>('open_mod_file').asFunction();
     openModFileC(file.toNativeUtf8());
@@ -66,6 +69,7 @@ class OpenMpt extends Object {
   }
 
 
+  // Helper function to load all MOD file song patterns and cache them in an array of array of strings.
   void loadAllPatterns() {
     allPatterns = getAllPatterns();
   }
@@ -80,6 +84,7 @@ class OpenMpt extends Object {
     return allPatterns;
   }
 
+  // Helper function to fetch a specific song pattern via FFI
   List<String> getPattern(int patternNum) {
     GetPattern getPatternZ = dyLib.lookupFunction<get_pattern_native, GetPattern>('get_pattern');
 
@@ -94,21 +99,25 @@ class OpenMpt extends Object {
     return pattern;
   }
 
+  // Helper to begin playing music via FFI function invocation
   void playMusic() {
     final PlayMusic playMusic = dyLib.lookup<NativeFunction<play_music_native>>('play_music').asFunction();
     playMusic();
   }
 
+  // Helper to stop playing music via FFI function invocation
   void stopMusic() {
     final StopMusic stopMusic = dyLib.lookup<NativeFunction<play_music_native>>('stop_music').asFunction();
     stopMusic();
   }
 
+  // Helper to invoke cleanup via FFI function invocation
   void shutdown() {
     final Shutdown shutdown = dyLib.lookup<NativeFunction<shutdown_native>>('shutdown').asFunction();
     shutdown();
   }
 
+  // Get the current status of the playing mod. This Struct helps us know what to print on screen.
   ModPosition getModPosition() {
     final GetModPosition = dyLib.lookupFunction<get_mod_position_native, get_mod_position_native>('get_mod_position');
     ModPosition position = GetModPosition();
@@ -116,8 +125,7 @@ class OpenMpt extends Object {
     return position;
   }
 
-
-
+  // Get the current array of Doubles
   StereoAudioBuffers getStereoAudioBuffers() {
     final GetStereoAudioBuffers = dyLib.lookupFunction<get_audio_buffers_native, GetAudioBuffers>('get_stereo_audio_buffers');
     StereoAudioBuffersNative buffers = GetStereoAudioBuffers();
@@ -133,9 +141,10 @@ class OpenMpt extends Object {
     return newBuffers;
   }
 
-  OpenMpt() {
-  }
+  // Empty constructor for posterity
+  OpenMpt() {}
 
+  // Utility to print out the mod file information
   void printModInfo() {
 
     print('[Dart]Mod title = ${modInfo.title.toDartString()}');
