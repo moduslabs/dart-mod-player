@@ -8,6 +8,7 @@
 
 #include "SoundManager.h"
 #include "OpenMPT.h"
+#include "DataTypes.h"
 
 // Position variables
 static int currPattern = -1;
@@ -54,8 +55,7 @@ void run() {
 
 extern "C" {
 
-#include "DataTypes.h"
-
+// This will listen to any interrupt signal and exit the program
 void interruptHandler(int sig) {
   printf("\nShutting down...\r\n");
   stop_music();
@@ -63,12 +63,14 @@ void interruptHandler(int sig) {
   exit(sig);
 }
 
+// Main function
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     printf("Error!! Need a file name.\nExample: ./Openmpt-test MainMenu.xm\n");
     exit(SND_MGR_ERR_NO_FILE_SPECIFIED);
   }
 
+  // register the signal handler
   signal(SIGINT, interruptHandler);
 
   int result = open_mod_file(argv[1]);
@@ -76,16 +78,19 @@ int main(int argc, char *argv[]) {
     printf("Could not load mod file: %s\n", argv[1]);
     return result;
   }
+
+  // open the mod file
   ModInfo modInfo = get_mod_info();
   printf("modInfo.title = %s\n", modInfo.title);
+
+  // Start playing music
   play_music();
 
   // Loop endlessly until CTRL + C is pressed
   run();
 
   SoundManager::Stop();
-  result = SoundManager::ShutDown();
-  return result;
+  return SoundManager::ShutDown();
 }
 
 
