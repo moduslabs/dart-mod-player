@@ -52,12 +52,11 @@ static int static_paStreamCallback(const void *inputBuffer,
 
   auto *out = (float*)outputBuffer;
 
+  SoundManager::LockMutex();
+
   if (modFile != nullptr) {
 
     modFile->read_interleaved_stereo(44100, numFrames, out);
-
-    mutex.lock();
-
 
     SoundManager::currentOrder = (int)modFile->get_current_order();
     SoundManager::currentPattern = (int)modFile->get_current_pattern();
@@ -76,7 +75,7 @@ static int static_paStreamCallback(const void *inputBuffer,
 
   }
 
-  mutex.unlock();
+  SoundManager::UnlockMutex();
 
   return 0;
 }
@@ -161,12 +160,12 @@ StereoAudioBuffers SoundManager::GetStereoAudioBuffers() {
   buffers.left_buffer = (double*)malloc(numLRFrames * sizeof(double));
   buffers.right_buffer = (double*)malloc(numLRFrames * sizeof(double));
 
-  mutex.lock();
+  LockMutex();
   for (int i = 0; i < bufferSize; ++i) {
     buffers.left_buffer[i] = ltBuffer[i];
     buffers.right_buffer[i] = rtBuffer[i];
   }
-  mutex.unlock();
+  UnlockMutex();
 
   return buffers;
 }
@@ -184,7 +183,6 @@ int SoundManager::LoadFile(char * filePath) {
 
     newModFile = new openmpt::module_ext(file);
 
-    // Todo:: Setup as a configuration option from the UI
     newModFile->set_repeat_count(999999);
     newModFile->set_render_param(3, 1);
 
@@ -195,12 +193,12 @@ int SoundManager::LoadFile(char * filePath) {
 
     SoundManager::Pause();
 
-    mutex.lock(); // Likely unnecessary.
+    LockMutex(); // Likely unnecessary.
 
     delete modFile;
     modFile = newModFile;
 
-    mutex.unlock();
+    UnlockMutex();
 
     return SND_MGR_NO_ERROR;
   }
@@ -227,13 +225,6 @@ ArrayOfStrings SoundManager::GetPattern(int patternNum) {
 
     strings.items[row] = (char*)malloc(rowString.length() * sizeof (char*) + 1 );
     strcpy(strings.items[row], rowString.c_str());
-
-//    printf("Row: %i -- %s \n", row, rowString.c_str());
-//    std::string rowNum = std::to_string(row);
-//    if (row < 10) {
-//      rowNum.insert(0, 1, '0');
-//    }
-//    printf("R: %s : %s \n", rowNum.c_str(), strings.items[row]);
   }
 
   return strings;
@@ -328,9 +319,9 @@ void SoundManager::SetModPosition(int order) {
     return;
   }
 
-  mutex.lock();
+  LockMutex();
   modFile->set_position_order_row(order, 0);
-  mutex.unlock();
+  UnlockMutex();
 };
 
 int SoundManager::Pause() {
