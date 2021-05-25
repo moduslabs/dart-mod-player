@@ -48,7 +48,7 @@ bash make-library.sh
 cd ../..
 
 # Run the experiment (from project root)
-dart mod-player.dart lib/OpenMPT/songs/Main_Menu.xm
+dart mod-player.dart songs/Main_Menu.xm
 
 # Hit CTRL + C to exit.
 ```
