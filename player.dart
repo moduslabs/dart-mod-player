@@ -5,12 +5,12 @@ import 'package:ffi/ffi.dart';
 
 import 'package:ansicolor/ansicolor.dart';
 
+// Colored "AnsiPen" instances to draw characters
 AnsiPen whitePen = new AnsiPen()..white();
 AnsiPen redPen = new AnsiPen()..red();
 AnsiPen bluePen = new AnsiPen()..blue();
 AnsiPen purplePen = new AnsiPen()..magenta();
 AnsiPen grayPen = new AnsiPen()..gray();
-
 AnsiPen blueBgPen = new AnsiPen()..blue(bg:true);
 
 // Colored Strings used to plot the Audio wave forms
@@ -18,6 +18,8 @@ final String leftDot = bluePen('▓');
 final String rightDot = redPen('▓');
 final String hyphen = grayPen('─');
 final String pipeChar = grayPen('│');
+final String spaceChar = ' ';
+
 
 //https://www.bbc.co.uk/bitesize/guides/zscvxfr/revision/4
 // ▓ ▒ ░
@@ -42,6 +44,8 @@ int prevRow = -1;
 int prevColumns = 0;
 int prevRows = 0;
 
+int midY = 0;
+int midX = 0;
 
 // Utility to draw the waveforms on screen
 void drawBuffers(OpenMpt openMpt) {
@@ -51,15 +55,18 @@ void drawBuffers(OpenMpt openMpt) {
   StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
 
   int numCols = stdout.terminalColumns - 1,
-      numRows = stdout.terminalLines - 10;
+      numRows = stdout.terminalLines - 8;
 
   // Clear the screen IF we end up resizing the terminal
   if (numCols != prevColumns || numRows != prevRows) {
-    clearScreen(hard:true);
+    clearScreen(hard:false);
+    midY = (numRows / 2).floor();
+    midX = (numCols / 2).floor();
   }
   else {
-    clearScreen(hard:false);
+    clearScreen(hard:true);
   }
+
 
   prevColumns = numCols;
   prevRows = numRows;
@@ -68,20 +75,9 @@ void drawBuffers(OpenMpt openMpt) {
 
   // Move positions of items only if the song position information has changed
   if (pos.current_order != prevOrd || pos.current_pattern != prevPat || pos.current_row != prevRow) {
-    fiveTrailingPatterns[0] = fiveTrailingPatterns[1];
-    fiveTrailingPatterns[1] = fiveTrailingPatterns[2];
-    fiveTrailingPatterns[2] = fiveTrailingPatterns[3];
-    fiveTrailingPatterns[3] = fiveTrailingPatterns[4];
-    fiveTrailingPatterns[4] = allPatterns[pos.current_pattern][pos.current_row];
+    fiveTrailingPatterns.removeAt(0);
+    fiveTrailingPatterns.add(allPatterns[pos.current_pattern][pos.current_row]);
   }
-
-  int idx = 0;
-  fiveTrailingPatterns.forEach((String str) {
-    if (str.length >= numCols) {
-      fiveTrailingPatterns[idx] = str.substring(0, numCols);
-    }
-    idx++;
-  });
 
   // Cache the previous values for comparison for the next run
   prevOrd = pos.current_order;
@@ -90,20 +86,27 @@ void drawBuffers(OpenMpt openMpt) {
 
 
   // Print out the five trailing patterns
-  print(fiveTrailingPatterns[0]);
-  print(fiveTrailingPatterns[1]);
-  print(fiveTrailingPatterns[2]);
-  print(fiveTrailingPatterns[3]);
-  print(blueBgPen(fiveTrailingPatterns[4]));
+  int idx = 0;
+  fiveTrailingPatterns.forEach((String str) {
+    if (str.length >= numCols) {
+      fiveTrailingPatterns[idx] = str.substring(0, numCols);
+    }
+
+    if (idx == 4) {
+      print(blueBgPen(fiveTrailingPatterns[idx]));
+    }
+    else {
+      print(fiveTrailingPatterns[idx]);
+    }
+
+    idx++;
+  });
+
   print('');
+
 
   //TODO: Investigate reuse versus recreation/destruction everytime this function is run.
   List<List<String>> screenBuffer = [];
-  String emptyString = ' ';
-
-  final int halfY = (numRows / 2).floor();
-  final int halfX = (numCols / 2).floor();
-
 
   /* Create memory space to act as a psuedo screen buffer. While allocating the
      arrays of Strings, we add '-' or '|' (pipe character) to draw the X and Y
@@ -114,11 +117,12 @@ void drawBuffers(OpenMpt openMpt) {
     List<String> row = [];
     for (int col = 0; col < numCols; col++) {
 
-      String str = emptyString;
-      if (rowNum == halfY) {
+      String str = spaceChar;
+      if (rowNum == midY) {
         str = hyphen;
       }
-      if (col == halfX) {
+
+      if (col == midX) {
         str = pipeChar;
       }
       row.add(str);
@@ -132,7 +136,7 @@ void drawBuffers(OpenMpt openMpt) {
   int samplesPerDot = (buffers.num_items / (numCols / 2)).floor();
 
   // LEFT channel
-  for (int col = 0; col < halfX; col++) {
+  for (int col = 0; col < midX; col++) {
     double leftSum = 0;
     for (int sampleIdx = 0; sampleIdx < samplesPerDot; sampleIdx++) {
 
@@ -147,9 +151,8 @@ void drawBuffers(OpenMpt openMpt) {
       }
     }
 
-
     double leftAverage = leftSum / samplesPerDot;
-    int leftChannelY = halfY + (leftAverage * numRows / 2).floor();
+    int leftChannelY = midY + (leftAverage * numRows / 2).floor();
 
     // Set the ceiling.
     if (leftChannelY < 0) {
@@ -166,12 +169,12 @@ void drawBuffers(OpenMpt openMpt) {
   }
 
   // RIGHT channel
-  int pointerColumn = 0;
-  for (int drawCol = halfX + 1; drawCol < numCols; drawCol++) {
+  int iterationNum = 0;
+  for (int drawCol = midX + 1; drawCol < numCols; drawCol++) {
     double rightSum = 0;
 
     for (int sampleIdx = 0; sampleIdx < samplesPerDot; sampleIdx++) {
-      int rtIndex = (pointerColumn * samplesPerDot) + sampleIdx;
+      int rtIndex = (iterationNum * samplesPerDot) + sampleIdx;
       if (rtIndex > buffers.right_buffer.length - 1) {
         rtIndex = buffers.right_buffer.length - 1;
       }
@@ -184,17 +187,21 @@ void drawBuffers(OpenMpt openMpt) {
     }
 
     double rightAverage = rightSum / samplesPerDot;
-    int rightChannelY = halfY + (rightAverage * numRows / 2).floor();
+    int rightChannelY = midY + (rightAverage * numRows / 2).floor();
 
+    // Set the ceiling.
     if (rightChannelY < 0) {
       rightChannelY = 0;
     }
+
+    // Set the floor.
     if (rightChannelY > numRows) {
       rightChannelY = numRows - 1;
     }
 
+    // Plot the value in the psuedo screen buffer.
     screenBuffer[rightChannelY][drawCol] = rightDot;
-    pointerColumn++;
+    iterationNum++;
   }
 
 
@@ -202,14 +209,12 @@ void drawBuffers(OpenMpt openMpt) {
   for (int rowNum = 0; rowNum < numRows; rowNum++) {
     print(screenBuffer[rowNum].join(''));
   }
-
 }
 
 bool shouldContinue = true;
 OpenMpt openMpt = OpenMpt();
 
-void updateView() async {
-  // For now this is an endless loop.
+void updateView() {
   if (shouldContinue) {
     final stopwatch = Stopwatch()..start();
 
@@ -221,9 +226,7 @@ void updateView() async {
     }
 
     Future.delayed(Duration(milliseconds: diff), updateView);
-
   }
-
 }
 
 main(List<String> args)  {
@@ -239,14 +242,13 @@ main(List<String> args)  {
   // Instruct the FFI connecting code to play the music.
   openMpt.playMusic();
 
+  // Begin Drawing
   updateView();
 
   ProcessSignal.sigint.watch().forEach((signal) {
     shouldContinue = false;
-    print('');
     clearScreen(hard:true);
 
-    // print("\x1B[0;0H");
     // Use the FFI connector to stop the playing thread
     openMpt.stopMusic();
 
