@@ -102,7 +102,7 @@ void drawBuffers(OpenMpt openMpt) {
     idx++;
   });
 
-  print('');
+  // print('');
 
 
   //TODO: Investigate reuse versus recreation/destruction everytime this function is run.
