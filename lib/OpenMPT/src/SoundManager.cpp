@@ -351,8 +351,8 @@ int SoundManager::Play() {
 }
 
 int SoundManager::Stop() {
-  int result = Pa_StopStream(stream);
   currentPlayMode = PLAY_MODE_STOPPED;
+  int result = Pa_StopStream(stream);
   return result;
 }
 
@@ -377,8 +377,8 @@ bool SoundManager::IsLoaded() {
 int SoundManager::ShutDown() {
   Stop();
   usleep(100);
-  delete modFile;
   int result = Pa_CloseStream(stream);
+  delete modFile;
 
   delete ltBuffer;
   delete rtBuffer;

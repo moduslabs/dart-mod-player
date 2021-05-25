@@ -19,9 +19,19 @@ final String rightDot = redPen('▓');
 final String hyphen = grayPen('─');
 final String pipeChar = grayPen('│');
 
-// print('col:${col} | row:${rowNum} | yPos:${yPos} | xPos:${xPos} | leftAvg:${leftAverage}');
 //https://www.bbc.co.uk/bitesize/guides/zscvxfr/revision/4
 // ▓ ▒ ░
+
+void clearScreen({bool hard = false}) {
+  if (hard) {
+    // Move Cursor 0,0 and clear the screen.
+    print("\x1B[2J\x1B[0;0H");
+  }
+  else {
+    // Move cursor to 0,0
+    print("\x1B[0;0H");
+  }
+}
 
 List<String> fiveTrailingPatterns = ["","","","",""];
 
@@ -32,9 +42,9 @@ int prevRow = -1;
 int prevColumns = 0;
 int prevRows = 0;
 
+
 // Utility to draw the waveforms on screen
 void drawBuffers(OpenMpt openMpt) {
-  print("\x1B[0;0H"); //clear screen
 
   ModPosition pos = openMpt.getModPosition();
   List<List<String>> allPatterns = openMpt.getAllPatterns();
@@ -45,7 +55,10 @@ void drawBuffers(OpenMpt openMpt) {
 
   // Clear the screen IF we end up resizing the terminal
   if (numCols != prevColumns || numRows != prevRows) {
-    print("\x1B[2J\x1B[0;0H");
+    clearScreen(hard:true);
+  }
+  else {
+    clearScreen(hard:false);
   }
 
   prevColumns = numCols;
@@ -192,12 +205,28 @@ void drawBuffers(OpenMpt openMpt) {
 
 }
 
-main(List<String> args) {
-  // This is used for testing only.
-  // OpenMpt openMpt = OpenMpt();
-  // openMpt.openModFile('/Users/jgarcia/projects/dart/dart-mod-player/songs/Dungeon2.xm');
+bool shouldContinue = true;
+OpenMpt openMpt = OpenMpt();
 
+void updateView() async {
+  // For now this is an endless loop.
+  if (shouldContinue) {
+    final stopwatch = Stopwatch()..start();
 
+    drawBuffers(openMpt);
+    int diff = 20 - stopwatch.elapsed.inMilliseconds;
+    // sleep ONLY if we need to.
+    if (diff < 0) {
+      diff = 0;
+    }
+
+    Future.delayed(Duration(milliseconds: diff), updateView);
+
+  }
+
+}
+
+main(List<String> args)  {
   // Check for args
   if (args.length < 1) {
     print('Error! Need a file name.');
@@ -205,54 +234,27 @@ main(List<String> args) {
   }
 
   // Create instance of OpenMpt and use the passed file path to open the MOD file.
-  OpenMpt openMpt = OpenMpt();
   openMpt.openModFile(args[0]);
 
   // Instruct the FFI connecting code to play the music.
   openMpt.playMusic();
 
+  updateView();
 
-  bool shouldContinue = true;
+  ProcessSignal.sigint.watch().forEach((signal) {
+    shouldContinue = false;
+    print('');
+    clearScreen(hard:true);
 
-  // TODO: Figure out the best way to capture SIGINT and exit gracefully.
-  // Catch CTRL+C (Signal Interrupt)
-  // int n = 0;
-  // ProcessSignal.sigint.watch().forEach((signal) {
-  //   print(" caught ${++n} of 3");
-  //
-  //   if (n == 3) {
-  //     exit(0);
-  //   }
-  //   // shouldContinue = false;
-  //   // print("Caught");
-  //   // exit(0);
-  // });
+    // print("\x1B[0;0H");
+    // Use the FFI connector to stop the playing thread
+    openMpt.stopMusic();
 
-  // Move Cursor 0,0 and clear the screen.
-  print("\x1B[2J\x1B[0;0H");
+    // Use FFI to begin to clean things up.
+    openMpt.shutdown();
+    exit(0);
+  });
 
-  // For now this is an endless loop.
-  while (true) {
 
-    if (shouldContinue) {
-      final stopwatch = Stopwatch()..start();
-      drawBuffers(openMpt);
-      // print('drawBuffers() executed in ${stopwatch.elapsed.inMilliseconds}');
-      if (stopwatch.elapsed.inMilliseconds < 20) {
-        int diff = 20 - stopwatch.elapsed.inMilliseconds;
-        // sleep ONLY if we need to.
-        if (diff > 0) {
-          sleep(Duration(milliseconds: diff));
-        }
-      }
-
-    }
-  }
-
-  // Use the FFI connector to stop the playing thread
-  openMpt.stopMusic();
-
-  // Use FFI to begin to clean things up.
-  openMpt.shutdown();
 }
 

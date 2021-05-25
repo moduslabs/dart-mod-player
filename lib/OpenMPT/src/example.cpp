@@ -51,6 +51,7 @@ void run() {
   }
 
   SoundManager::Stop();
+  SoundManager::ShutDown();
 }
 
 
@@ -61,8 +62,8 @@ extern "C" {
 void interruptHandler(int sig) {
   printf("\nShutting down...\r\n");
   stop_music();
-  shutdown();
-  exit(sig);
+  int result = shutdown();
+  return exit(result);
 }
 
 // Main function
