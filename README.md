@@ -50,7 +50,7 @@ bash make-library.sh
 cd ../..
 
 # Run the experiment (from project root)
-dart mod-player.dart songs/Main_Menu.xm
+dart player.dart songs/Main_Menu.xm
 
 # Hit CTRL + C to exit.
 ```
