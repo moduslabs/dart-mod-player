@@ -25,13 +25,14 @@ The following _assumes_ you have the following dependencies installed:
 - git
 
 For Linux:
-- You'll need to install libsndfile-dev libasound-dev
+- libsndfile-dev
+- libasound-dev
 
 ```bash
 # Clone this repo:
 git clone https://github.com/moduslabs/dart-mod-player.git
 
-# Grab dart dependencis
+# Grab dart dependencies
 cd dart-mod-player
 dart pub get
 
