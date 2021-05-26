@@ -40,15 +40,18 @@ void run() {
         prevOrder = currOrder;
       }
 
+      // Holistically, this is wasteful, but it gives us an opportunity
+      // to exercise SoundManager::GetPattern();
       ArrayOfStrings pattern = SoundManager::GetPattern(currPattern);
       printf("%s\n", pattern.items[currRow]);
-      pattern.destroy();
+      pattern.free();
     }
 
     usleep(5000);
   }
 
   SoundManager::Stop();
+  SoundManager::ShutDown();
 }
 
 
@@ -59,8 +62,8 @@ extern "C" {
 void interruptHandler(int sig) {
   printf("\nShutting down...\r\n");
   stop_music();
-  shutdown();
-  exit(sig);
+  int result = shutdown();
+  return exit(result);
 }
 
 // Main function

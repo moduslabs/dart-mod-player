@@ -34,10 +34,6 @@ public:
   static int currentRow;
   static int currentNumRows;
 
-
-//  explicit SoundManager();
-//  ~SoundManager();
-
   static int InitSound();
   static int ShutDown();
 

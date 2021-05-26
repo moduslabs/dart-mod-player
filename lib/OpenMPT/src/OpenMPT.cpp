@@ -6,9 +6,9 @@ extern "C" {
 #include "DataTypes.h"
 
 
+  // Todo: convert to use new / delete
 ModInfo get_mod_info() {
   ModInfo modInfo = SoundManager::GetModInfo();
-  printf("%s: title %s\n", __PRETTY_FUNCTION__ , modInfo.title);
   return modInfo;
 }
 
