@@ -35,7 +35,7 @@ void clearScreen({bool hard = false}) {
   }
 }
 
-List<String> fiveTrailingPatterns = ["","","","",""];
+List<String> patternbuffer = ["","","","",""];
 
 // Save position data locally
 int prevOrd = -1;
@@ -55,19 +55,19 @@ void drawBuffers(OpenMpt openMpt) {
   StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
 
   int numCols = stdout.terminalColumns - 1,
-      numRows = stdout.terminalLines - 8;
+      numRows = stdout.terminalLines - 9;
 
   // Clear the screen IF we end up resizing the terminal
   if (numCols != prevColumns || numRows != prevRows) {
-    clearScreen(hard:false);
+    clearScreen(hard:true);
     midY = (numRows / 2).floor();
     midX = (numCols / 2).floor();
   }
   else {
-    clearScreen(hard:true);
+    clearScreen(hard:false);
   }
 
-
+  // cache previous values
   prevColumns = numCols;
   prevRows = numRows;
 
@@ -75,8 +75,8 @@ void drawBuffers(OpenMpt openMpt) {
 
   // Move positions of items only if the song position information has changed
   if (pos.current_order != prevOrd || pos.current_pattern != prevPat || pos.current_row != prevRow) {
-    fiveTrailingPatterns.removeAt(0);
-    fiveTrailingPatterns.add(allPatterns[pos.current_pattern][pos.current_row]);
+    patternbuffer.removeAt(0);
+    patternbuffer.add(allPatterns[pos.current_pattern][pos.current_row]);
   }
 
   // Cache the previous values for comparison for the next run
@@ -86,23 +86,24 @@ void drawBuffers(OpenMpt openMpt) {
 
 
   // Print out the five trailing patterns
-  int idx = 0;
-  fiveTrailingPatterns.forEach((String str) {
+  for (int idx = 0; idx < patternbuffer.length; idx++) {
+    String str = patternbuffer[idx];
+
     if (str.length >= numCols) {
-      fiveTrailingPatterns[idx] = str.substring(0, numCols);
+      patternbuffer[idx] = str.substring(0, numCols);
     }
 
-    if (idx == 4) {
-      print(blueBgPen(fiveTrailingPatterns[idx]));
+    if (idx == patternbuffer.length - 1) {
+      print(blueBgPen(patternbuffer[idx]));
     }
     else {
-      print(fiveTrailingPatterns[idx]);
+      print(patternbuffer[idx]);
     }
 
-    idx++;
-  });
+  };
 
-  // print('');
+  // Add one line underneath the pattern view
+  print('');
 
 
   //TODO: Investigate reuse versus recreation/destruction everytime this function is run.
