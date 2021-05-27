@@ -8,7 +8,7 @@ std::mutex mutex;
 
 #define NUM_FRAMES 1024
 
-
+StereoAudioBuffers SoundManager::buffers = {};
 
 static double soundVolume = 0; //[ 0 - 200 ];
 
@@ -120,6 +120,12 @@ int SoundManager::currentNumRows = -1;
 int SoundManager::currentPlayMode = -1;
 
 int SoundManager::InitSound() {
+  if (! buffers.numItems) {
+    buffers.numItems = numLRFrames;
+    buffers.left_buffer = (double*)malloc(numLRFrames * sizeof(double));
+    buffers.right_buffer = (double*)malloc(numLRFrames * sizeof(double));
+  }
+
   currentOrder = -1,
   currentPattern = -1,
   currentRow = -1;
@@ -154,11 +160,6 @@ ModPosition SoundManager::GetModPosition() {
 }
 
 StereoAudioBuffers SoundManager::GetStereoAudioBuffers() {
-  StereoAudioBuffers buffers = {};
-
-  buffers.numItems = numLRFrames;
-  buffers.left_buffer = (double*)malloc(numLRFrames * sizeof(double));
-  buffers.right_buffer = (double*)malloc(numLRFrames * sizeof(double));
 
   LockMutex();
   for (int i = 0; i < bufferSize; ++i) {
@@ -211,22 +212,6 @@ ArrayOfStrings SoundManager::GetPattern(int patternNum) {
   int numItems = modFile->get_pattern_num_rows(patternNum);;
   ArrayOfStrings strings; // Use new / delete over static creation
   strings.InitializeWithNumItems(numItems);
-//  strings.items = (char**)malloc(strings.numItems * sizeof(char *));
-
-
-//  for (int row = 0; row < strings.numItems; ++row) {
-//    std::string rowString;
-//
-//    for (int i = 0; i < modInfoObject.num_channels; ++i) {
-//      rowString = rowString.append(modFile->format_pattern_row_channel(patternNum, row, i, 0, true));
-//      if (i < modInfoObject.num_channels - 1) {
-//        rowString = rowString.append("|");
-//      }
-//    }
-//
-//    strings.items[row] = (char*)malloc(rowString.length() * sizeof (char*) + 1 );
-//    strcpy(strings.items[row], rowString.c_str());
-//  }
 
 
   for (int row = 0; row < numItems; ++row) {
@@ -380,8 +365,15 @@ int SoundManager::ShutDown() {
   int result = Pa_CloseStream(stream);
   delete modFile;
 
-  delete ltBuffer;
-  delete rtBuffer;
+  free(ltBuffer);
+  free(rtBuffer);
+
+  if (buffers.left_buffer) {
+    free(buffers.left_buffer);
+  }
+  if (buffers.right_buffer) {
+    free(buffers.right_buffer);
+  }
 
 
   if (modInfoObject.title != nullptr) free(modInfoObject.title);

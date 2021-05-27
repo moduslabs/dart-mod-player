@@ -27,6 +27,7 @@ class SoundManager {
 
 
 public:
+  static StereoAudioBuffers buffers;
 
   static int currentPlayMode;
   static int currentOrder;

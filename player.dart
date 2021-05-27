@@ -46,12 +46,12 @@ int prevRows = 0;
 
 int midY = 0;
 int midX = 0;
+List<List<String>> allPatterns = [['']];
 
 // Utility to draw the waveforms on screen
 void drawBuffers(OpenMpt openMpt) {
 
   ModPosition pos = openMpt.getModPosition();
-  List<List<String>> allPatterns = openMpt.getAllPatterns();
   StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
 
   int numCols = stdout.terminalColumns - 1,
@@ -239,6 +239,7 @@ main(List<String> args)  {
 
   // Create instance of OpenMpt and use the passed file path to open the MOD file.
   openMpt.openModFile(args[0]);
+  allPatterns = openMpt.getAllPatterns();
 
   // Instruct the FFI connecting code to play the music.
   openMpt.playMusic();
