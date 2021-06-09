@@ -171,6 +171,14 @@ StereoAudioBuffers SoundManager::GetStereoAudioBuffers() {
   return buffers;
 }
 
+void SoundManager::FreeArrayOfStrings(ArrayOfStrings *arrayOfStrings) {
+  if (!arrayOfStrings) {
+    return;
+  }
+
+  arrayOfStrings->free();
+}
+
 int SoundManager::LoadFile(char * filePath) {
   SoundManager::Stop();
 
@@ -210,7 +218,7 @@ int SoundManager::LoadFile(char * filePath) {
 ArrayOfStrings SoundManager::GetPattern(int patternNum) {
 
   int numItems = modFile->get_pattern_num_rows(patternNum);;
-  ArrayOfStrings strings; // Use new / delete over static creation
+  ArrayOfStrings strings = {}; // Use new / delete over static creation
   strings.InitializeWithNumItems(numItems);
 
 
