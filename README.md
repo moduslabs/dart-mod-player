@@ -5,9 +5,13 @@
 
 Dart MOD Player is a experiment that uses Dart FFI to play music using the Amiga MOD style format. This experiment will paint terminal with the Pattern information from the song, as well as draw waveforms for the left and right channels, rendering at up to 60fps. This project has been tested with macOS Big Sur and Ubuntu Linux 20.04+.
 
-![dart-mod-player-example](https://user-images.githubusercontent.com/180031/119661239-16fdb280-bdfe-11eb-9b64-87dd0094ab94.gif)
+![dart-mod-player-live-waveform-example](https://user-images.githubusercontent.com/180031/121401677-0170a880-c927-11eb-8e95-7ea61cf30dc3.gif)
+![dart-mod-player-timed-waveform-example](https://user-images.githubusercontent.com/180031/121401678-0170a880-c927-11eb-80cd-5920420bac64.gif)
 
 
+
+
+https://user-images.githubusercontent.com/180031/121401297-8d360500-c926-11eb-8c43-ee0ebc3eecf3.mov
 
 - [Getting Started](#getting-started)
 - [How it Works](#how-it-works)
