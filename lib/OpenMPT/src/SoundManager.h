@@ -47,6 +47,8 @@ public:
 
   static bool IsLoaded();
 
+  static void FreeArrayOfStrings(ArrayOfStrings *arrayOfStrings);
+
 
   static int LoadFile(char *filePath);
   static ModInfo GetModInfo();

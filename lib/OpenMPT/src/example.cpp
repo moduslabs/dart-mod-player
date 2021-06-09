@@ -25,6 +25,9 @@ void run() {
 
   int prevOrder = 0;
 
+  ArrayOfStrings pattern = SoundManager::GetPattern(0);
+//  free
+
   while (SoundManager::currentPlayMode == PLAY_MODE_PLAYING && SoundManager::IsLoaded()) {
     SoundManager::GetStereoAudioBuffers(); // This is here just to exercise this method.
 
