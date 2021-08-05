@@ -336,8 +336,6 @@ OpenMpt openMpt = OpenMpt();
 
 void updateView() {
   if (shouldContinue) {
-
-
     final stopwatch = Stopwatch()..start();
 
     drawAudioBuffers(openMpt);
