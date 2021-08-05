@@ -25,8 +25,7 @@ void run() {
 
   int prevOrder = 0;
 
-  ArrayOfStrings pattern = SoundManager::GetPattern(0);
-//  free
+  SoundManager::GetPattern(0);
 
   while (SoundManager::currentPlayMode == PLAY_MODE_PLAYING && SoundManager::IsLoaded()) {
     SoundManager::GetStereoAudioBuffers(); // This is here just to exercise this method.
@@ -40,7 +39,7 @@ void run() {
       currRow     = modPosition.current_row;
 
       if (currOrder != prevOrder) {
-        prevOrder = currOrder;
+       prevOrder = currOrder;
       }
 
       // Holistically, this is wasteful, but it gives us an opportunity
@@ -57,9 +56,6 @@ void run() {
   SoundManager::ShutDown();
 }
 
-
-
-extern "C" {
 
 // This will listen to any interrupt signal and exit the program
 void interruptHandler(int sig) {
@@ -99,5 +95,3 @@ int main(int argc, char *argv[]) {
   return SoundManager::ShutDown();
 }
 
-
-} // extern ""C

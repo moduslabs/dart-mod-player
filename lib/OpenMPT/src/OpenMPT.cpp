@@ -1,12 +1,8 @@
 #include "OpenMPT.h"
-
+#include "DataTypes.h"
 
 extern "C" {
 
-#include "DataTypes.h"
-
-
-  // Todo: convert to use new / delete
 ModInfo get_mod_info() {
   ModInfo modInfo = SoundManager::GetModInfo();
   return modInfo;
@@ -46,10 +42,6 @@ int stop_music() {
 
 int shutdown() {
   return SoundManager::ShutDown();
-}
-
-void freeArrayOfStrings(ArrayOfStrings *arrayOfStrings) {
-  SoundManager::FreeArrayOfStrings();
 }
 
 
