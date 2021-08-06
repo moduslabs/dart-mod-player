@@ -49,7 +49,7 @@ int shutdown() {
 }
 
 void freeArrayOfStrings(ArrayOfStrings *arrayOfStrings) {
-  SoundManager::FreeArrayOfStrings();
+  SoundManager::FreeArrayOfStrings(arrayOfStrings);
 }
 
 
