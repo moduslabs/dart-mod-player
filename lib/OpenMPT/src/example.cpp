@@ -35,7 +35,7 @@ void run() {
       currRow     = modPosition.current_row;
 
       if (currOrder != prevOrder) {
-       prevOrder = currOrder;
+        prevOrder = currOrder;
       }
 
       // Holistically, this is wasteful, but it gives us an opportunity
