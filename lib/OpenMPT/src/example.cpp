@@ -5,7 +5,6 @@
 #include <csignal>
 #endif
 
-
 #include "SoundManager.h"
 #include "OpenMPT.h"
 #include "DataTypes.h"
@@ -22,10 +21,7 @@ void run() {
   currOrder = -1;
   currRow = -1;
 
-
   int prevOrder = 0;
-
-  SoundManager::GetPattern(0);
 
   while (SoundManager::currentPlayMode == PLAY_MODE_PLAYING && SoundManager::IsLoaded()) {
     SoundManager::GetStereoAudioBuffers(); // This is here just to exercise this method.
@@ -62,7 +58,7 @@ void interruptHandler(int sig) {
   printf("\nShutting down...\r\n");
   stop_music();
   int result = shutdown();
-  return exit(result);
+  exit(result);
 }
 
 // Main function
