@@ -7,7 +7,7 @@ import 'package:ffi/ffi.dart';
 import 'dart_openmpt_structs.dart';
 
 // Create the function type definitions
-typedef openModFile_native = Int32 Function(Pointer<Utf8> str);
+typedef open_mod_file_native = Int32 Function(Pointer<Utf8> str);
 typedef OpenModFile = int Function(Pointer<Utf8> str);
 
 typedef play_music_native = Int32 Function();
@@ -59,7 +59,7 @@ class OpenMpt extends Object {
 
   // Opens a Mod file via shared Library function
   void openModFile(String file) {
-    final OpenModFile openModFileC = dyLib.lookup<NativeFunction<openModFile_native>>('open_mod_file').asFunction();
+    final OpenModFile openModFileC = dyLib.lookup<NativeFunction<open_mod_file_native>>('open_mod_file').asFunction();
     openModFileC(file.toNativeUtf8());
 
     final GetModFileInfo = dyLib.lookupFunction<get_mod_info_native, get_mod_info_native>('get_mod_info');
