@@ -31,25 +31,25 @@ typedef GetAudioBuffers = StereoAudioBuffersNative Function();
 
 
 // Load the compiled CPP Library
-String LoadLibrary() {
+String getLibPath() {
 
   String currentPath = Directory.current.path;
   final String libraryName = 'OpenMPT';
 
   // Link shared objects
-  String libraryPath = path.join(currentPath, 'lib/${libraryName}/build/', 'libdartopenmpt.so');
+  String libPath = path.join(currentPath, 'lib/${libraryName}/build/', 'libdartopenmpt.so');
   if (Platform.isMacOS) {
-    libraryPath = path.join(currentPath, 'lib/${libraryName}/build/', 'libdartopenmpt.dylib');
+    libPath = path.join(currentPath, 'lib/${libraryName}/build/', 'libdartopenmpt.dylib');
   }
   if (Platform.isWindows) {
-    libraryPath = path.join(currentPath, 'lib/${libraryName}/build/', 'Debug', 'libdartopenmpt.dll');
+    libPath = path.join(currentPath, 'lib/${libraryName}/build/', 'Debug', 'libdartopenmpt.dll');
   }
 
-  return libraryPath;
+  return libPath;
 }
 
 // Load the compiled (shared) CPP Libraries
-String libraryPath = LoadLibrary();
+String libraryPath = getLibPath();
 
 
 class OpenMpt extends Object {
