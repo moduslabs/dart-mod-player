@@ -52,7 +52,7 @@ int midX = 0;
 List<List<String>> allPatterns = [['']];
 
 /*
-   Create memory space to act as a psuedo screen buffer. While allocating the
+   Create memory space to act as a psuedo-screen buffer. While allocating the
    arrays of Strings, we add '-' or '|' (pipe character) to draw the X and Y
    axes.
    Is there a more efficient way of doing this?

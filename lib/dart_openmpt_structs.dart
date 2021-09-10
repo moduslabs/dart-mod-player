@@ -45,6 +45,7 @@ class ModPosition extends Struct {
 }
 
 class ModInfo extends Struct {
+  ModInfo() {}
   external Pointer<Utf8> file_name;
   external Pointer<Utf8> song_name;
   external Pointer<Utf8> artist;

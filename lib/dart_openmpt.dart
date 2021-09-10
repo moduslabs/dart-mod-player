@@ -30,9 +30,8 @@ typedef get_audio_buffers_native = StereoAudioBuffersNative Function();
 typedef GetAudioBuffers = StereoAudioBuffersNative Function();
 
 
-// Load the compiled CPP Library
+// Setup the CPP library path
 String getLibPath() {
-
   String currentPath = Directory.current.path;
   final String libraryName = 'OpenMPT';
 
@@ -49,7 +48,7 @@ String getLibPath() {
 }
 
 // Load the compiled (shared) CPP Libraries
-String libraryPath = getLibPath();
+final String libraryPath = getLibPath();
 
 
 class OpenMpt extends Object {
@@ -146,7 +145,6 @@ class OpenMpt extends Object {
 
   // Utility to print out the mod file information
   void printModInfo() {
-
     print('[Dart]Mod title = ${modInfo.title.toDartString()}');
     print('[Dart]Mod artist = ${modInfo.artist.toDartString()}');
     print('[Dart]Mod type = ${modInfo.type.toDartString()}');
@@ -164,6 +162,5 @@ class OpenMpt extends Object {
     print('[Dart]Mod bpm = ${modInfo.bpm}');
     print('[Dart]Mod length = ${modInfo.length}');
     print('[Dart]Mod num_orders = ${modInfo.num_orders}');
-
   }
 }
