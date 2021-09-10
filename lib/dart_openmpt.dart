@@ -140,8 +140,8 @@ class OpenMpt extends Object {
     return newBuffers;
   }
 
-  // Empty constructor for posterity
-  OpenMpt() {}
+  // // Empty constructor for posterity
+  // OpenMpt() {}
 
   // Utility to print out the mod file information
   void printModInfo() {
