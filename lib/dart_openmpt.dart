@@ -1,6 +1,6 @@
 import 'dart:ffi';
-import 'dart:io' show Directory, Platform, sleep, exit;
-import 'package:path/path.dart' as path;
+import 'dart:io'show Directory, Platform, sleep, exit;
+import 'package:path/path.dart'as path;
 import 'package:ffi/ffi.dart';
 
 
@@ -58,8 +58,8 @@ class OpenMpt extends Object {
 
   // Opens a Mod file via shared Library function
   void openModFile(String file) {
-    final OpenModFile openModFileC = dyLib.lookup<NativeFunction<open_mod_file_native>>('open_mod_file').asFunction();
-    openModFileC(file.toNativeUtf8());
+    final OpenModFile openModFileFn = dyLib.lookup<NativeFunction<open_mod_file_native>>('open_mod_file').asFunction();
+    openModFileFn(file.toNativeUtf8());
 
     final GetModFileInfo = dyLib.lookupFunction<get_mod_info_native, get_mod_info_native>('get_mod_info');
 
@@ -85,9 +85,9 @@ class OpenMpt extends Object {
 
   // Helper function to fetch a specific song pattern via FFI
   List<String> getPattern(int patternNum) {
-    GetPattern getPatternZ = dyLib.lookupFunction<get_pattern_native, GetPattern>('get_pattern');
+    GetPattern getPatternFn = dyLib.lookupFunction<get_pattern_native, GetPattern>('get_pattern');
 
-    ArrayOfStrings patternStrings = getPatternZ(patternNum);
+    ArrayOfStrings patternStrings = getPatternFn(patternNum);
 
     List<String> pattern = [];
 
@@ -100,32 +100,32 @@ class OpenMpt extends Object {
 
   // Helper to begin playing music via FFI function invocation
   void playMusic() {
-    final PlayMusic playMusic = dyLib.lookup<NativeFunction<play_music_native>>('play_music').asFunction();
-    playMusic();
+    final PlayMusic playMusicFn = dyLib.lookup<NativeFunction<play_music_native>>('play_music').asFunction();
+    playMusicFn();
   }
 
   // Helper to stop playing music via FFI function invocation
   void stopMusic() {
-    final StopMusic stopMusic = dyLib.lookup<NativeFunction<play_music_native>>('stop_music').asFunction();
-    stopMusic();
+    final StopMusic stopMusicFn = dyLib.lookup<NativeFunction<play_music_native>>('stop_music').asFunction();
+    stopMusicFn();
   }
 
   // Helper to invoke cleanup via FFI function invocation
   void shutdown() {
-    final Shutdown shutdown = dyLib.lookup<NativeFunction<shutdown_native>>('shutdown').asFunction();
-    shutdown();
+    final Shutdown shutdownFn = dyLib.lookup<NativeFunction<shutdown_native>>('shutdown').asFunction();
+    shutdownFn();
   }
 
   // Get the current status of the playing mod. This Struct helps us know what to print on screen.
   ModPosition getModPosition() {
-    final GetModPosition = dyLib.lookupFunction<get_mod_position_native, get_mod_position_native>('get_mod_position');
-    return GetModPosition();
+    final getModPositionFn = dyLib.lookupFunction<get_mod_position_native, get_mod_position_native>('get_mod_position');
+    return getModPositionFn();
   }
 
   // Get the current array of Doubles
   StereoAudioBuffers getStereoAudioBuffers() {
-    final GetStereoAudioBuffers = dyLib.lookupFunction<get_audio_buffers_native, GetAudioBuffers>('get_stereo_audio_buffers');
-    StereoAudioBuffersNative buffers = GetStereoAudioBuffers();
+    final GetStereoBuffersFn = dyLib.lookupFunction<get_audio_buffers_native, GetAudioBuffers>('get_stereo_audio_buffers');
+    StereoAudioBuffersNative buffers = GetStereoBuffersFn();
 
     StereoAudioBuffers newBuffers = StereoAudioBuffers();
     newBuffers.num_items = buffers.numItems;
