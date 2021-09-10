@@ -119,9 +119,7 @@ class OpenMpt extends Object {
   // Get the current status of the playing mod. This Struct helps us know what to print on screen.
   ModPosition getModPosition() {
     final GetModPosition = dyLib.lookupFunction<get_mod_position_native, get_mod_position_native>('get_mod_position');
-    ModPosition position = GetModPosition();
-
-    return position;
+    return GetModPosition();
   }
 
   // Get the current array of Doubles
@@ -139,9 +137,6 @@ class OpenMpt extends Object {
 
     return newBuffers;
   }
-
-  // // Empty constructor for posterity
-  // OpenMpt() {}
 
   // Utility to print out the mod file information
   void printModInfo() {
