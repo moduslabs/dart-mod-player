@@ -11,18 +11,17 @@ class ArrayOfStrings extends Struct {
   external Pointer<Pointer<Utf8>> items;
 }
 
-class StereoAudioBuffers extends Object {
-  List<double> left_buffer = [];
-  List<double> right_buffer = [];
-  int num_items = 0;
-}
-
-class StereoAudioBuffersDart extends Struct {
+class StereoAudioBuffers extends Struct {
   @Int32()
   external int numItems;
 
   external Pointer<Double> left_buffer;
   external Pointer<Double> right_buffer;
+}
+class StereoAudioBuffersDart extends Object {
+  List<double> left_buffer = [];
+  List<double> right_buffer = [];
+  int num_items = 0;
 }
 
 

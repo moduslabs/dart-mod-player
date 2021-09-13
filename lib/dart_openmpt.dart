@@ -26,8 +26,8 @@ typedef GetPattern = ArrayOfStrings Function(int patternNum);
 
 typedef get_mod_position_native = ModPosition Function();
 
-typedef get_audio_buffers_native = StereoAudioBuffersDart Function();
-typedef GetAudioBuffers = StereoAudioBuffersDart Function();
+typedef get_audio_buffers_native = StereoAudioBuffers Function();
+typedef GetAudioBuffers = StereoAudioBuffers Function();
 
 
 // Setup the CPP library path
@@ -123,11 +123,11 @@ class OpenMpt extends Object {
   }
 
   // Get the current array of Doubles
-  StereoAudioBuffers getStereoAudioBuffers() {
+  StereoAudioBuffersDart getStereoAudioBuffers() {
     final GetStereoBuffersFn = dyLib.lookupFunction<get_audio_buffers_native, GetAudioBuffers>('get_stereo_audio_buffers');
-    StereoAudioBuffersDart buffers = GetStereoBuffersFn();
+    StereoAudioBuffers buffers = GetStereoBuffersFn();
 
-    StereoAudioBuffers newBuffers = StereoAudioBuffers();
+    StereoAudioBuffersDart newBuffers = StereoAudioBuffersDart();
     newBuffers.num_items = buffers.numItems;
 
     for (int i = 0; i < buffers.numItems; i++) {

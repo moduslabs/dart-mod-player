@@ -82,7 +82,7 @@ List<List<String>> newWaveformScreenBuffer(int numCols, int numRows) {
   return screenBuffer;
 }
 
-void drawLiveWaveform(List<List<String>> screenBuffer, StereoAudioBuffers buffers, int numCols, int numRows) {
+void drawLiveWaveform(List<List<String>> screenBuffer, StereoAudioBuffersDart buffers, int numCols, int numRows) {
 
   // We use samplesPerDot to create averages of values so the waveform can make
   // use of the full 512 values per stereo channel.
@@ -161,7 +161,7 @@ void drawLiveWaveform(List<List<String>> screenBuffer, StereoAudioBuffers buffer
 List<int> priorLeftValues = [];
 List<int> priorRightValues = [];
 
-void drawTimedWaveform(List<List<String>> screenBuffer, StereoAudioBuffers buffers, int numCols, int numRows) {
+void drawTimedWaveform(List<List<String>> screenBuffer, StereoAudioBuffersDart buffers, int numCols, int numRows) {
   int numValues = priorLeftValues.length - 1;
   int floor = ((numRows) * .9).floor();
 
@@ -262,7 +262,7 @@ int mode = mode_type.LIVE_WAVEFORM.index;
 void drawAudioBuffers(OpenMpt openMpt) {
 
   ModPosition pos = openMpt.getModPosition();
-  StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
+  StereoAudioBuffersDart buffers = openMpt.getStereoAudioBuffers();
 
   int numCols = stdout.terminalColumns - 1,
       numRows = stdout.terminalLines - 9;
