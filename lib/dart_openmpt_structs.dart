@@ -4,20 +4,6 @@ import 'package:ffi/ffi.dart';
 // This file contains the class definitions used to convert C data structures
 // to Dart data structures.
 
-class ArrayOfInt32s extends Struct {
-  @Int32()
-  external int numItems;
-
-  external Pointer<Int32> items;
-}
-
-class ArrayOfDoubles extends Struct {
-  @Int32()
-  external int numItems;
-
-  external Pointer<Double> items;
-}
-
 class ArrayOfStrings extends Struct {
   @Int32()
   external int numItems;
@@ -31,6 +17,12 @@ class StereoAudioBuffersNative extends Struct {
 
   external Pointer<Double> left_buffer;
   external Pointer<Double> right_buffer;
+}
+
+class StereoAudioBuffers extends Object {
+  List<double> left_buffer = [];
+  List<double> right_buffer = [];
+  int num_items = 0;
 }
 
 class ModPosition extends Struct {
@@ -83,14 +75,18 @@ class ModInfo extends Struct {
   external double length;
 }
 
-class StereoAudioBuffers extends Object {
-  List<double> left_buffer = [];
-  List<double> right_buffer = [];
-  int num_items = 0;
+
+class ArrayOfInt32s extends Struct {
+  @Int32()
+  external int numItems;
+
+  external Pointer<Int32> items;
 }
 
+class ArrayOfDoubles extends Struct {
+  @Int32()
+  external int numItems;
 
-
-
-
+  external Pointer<Double> items;
+}
 
