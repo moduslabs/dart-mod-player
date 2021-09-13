@@ -11,6 +11,12 @@ class ArrayOfStrings extends Struct {
   external Pointer<Pointer<Utf8>> items;
 }
 
+class StereoAudioBuffers extends Object {
+  List<double> left_buffer = [];
+  List<double> right_buffer = [];
+  int num_items = 0;
+}
+
 class StereoAudioBuffersNative extends Struct {
   @Int32()
   external int numItems;
@@ -19,11 +25,6 @@ class StereoAudioBuffersNative extends Struct {
   external Pointer<Double> right_buffer;
 }
 
-class StereoAudioBuffers extends Object {
-  List<double> left_buffer = [];
-  List<double> right_buffer = [];
-  int num_items = 0;
-}
 
 class ModPosition extends Struct {
   @Int32()
