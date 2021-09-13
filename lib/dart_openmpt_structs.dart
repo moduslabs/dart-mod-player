@@ -17,7 +17,7 @@ class StereoAudioBuffers extends Object {
   int num_items = 0;
 }
 
-class StereoAudioBuffersNative extends Struct {
+class StereoAudioBuffersDart extends Struct {
   @Int32()
   external int numItems;
 
