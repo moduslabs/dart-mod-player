@@ -18,6 +18,7 @@ class StereoAudioBuffers extends Struct {
   external Pointer<Double> left_buffer;
   external Pointer<Double> right_buffer;
 }
+
 class StereoAudioBuffersDart extends Object {
   List<double> left_buffer = [];
   List<double> right_buffer = [];
