@@ -52,7 +52,7 @@ int midX = 0;
 List<List<String>> allPatterns = [['']];
 
 /*
-   Create memory space to act as a psuedo screen buffer. While allocating the
+   Create memory space to act as a psuedo-screen buffer. While allocating the
    arrays of Strings, we add '-' or '|' (pipe character) to draw the X and Y
    axes.
    Is there a more efficient way of doing this?
@@ -82,7 +82,7 @@ List<List<String>> newWaveformScreenBuffer(int numCols, int numRows) {
   return screenBuffer;
 }
 
-void drawLiveWaveform(List<List<String>> screenBuffer, StereoAudioBuffers buffers, int numCols, int numRows) {
+void drawLiveWaveform(List<List<String>> screenBuffer, StereoAudioBuffersDart buffers, int numCols, int numRows) {
 
   // We use samplesPerDot to create averages of values so the waveform can make
   // use of the full 512 values per stereo channel.
@@ -161,7 +161,7 @@ void drawLiveWaveform(List<List<String>> screenBuffer, StereoAudioBuffers buffer
 List<int> priorLeftValues = [];
 List<int> priorRightValues = [];
 
-void drawTimedWaveform(List<List<String>> screenBuffer, StereoAudioBuffers buffers, int numCols, int numRows) {
+void drawTimedWaveform(List<List<String>> screenBuffer, StereoAudioBuffersDart buffers, int numCols, int numRows) {
   int numValues = priorLeftValues.length - 1;
   int floor = ((numRows) * .9).floor();
 
@@ -262,7 +262,7 @@ int mode = mode_type.LIVE_WAVEFORM.index;
 void drawAudioBuffers(OpenMpt openMpt) {
 
   ModPosition pos = openMpt.getModPosition();
-  StereoAudioBuffers buffers = openMpt.getStereoAudioBuffers();
+  StereoAudioBuffersDart buffers = openMpt.getStereoAudioBuffers();
 
   int numCols = stdout.terminalColumns - 1,
       numRows = stdout.terminalLines - 9;
@@ -336,8 +336,6 @@ OpenMpt openMpt = OpenMpt();
 
 void updateView() {
   if (shouldContinue) {
-
-
     final stopwatch = Stopwatch()..start();
 
     drawAudioBuffers(openMpt);

@@ -44,8 +44,6 @@ static int static_paStreamCallback(const void *inputBuffer,
   (void) inputBuffer;
   (void) userData;
 
-
-
   if (statusFlags == paOutputUnderflow) {
     printf("Underflow!!\n");
   }
@@ -65,7 +63,7 @@ static int static_paStreamCallback(const void *inputBuffer,
 
     auto *outBuff = (float *)outputBuffer;
 
-    // Copy data from
+    // Copy data from source to destination buffers
     int index = 0;
     for (int i = 0; i < numFrames; i+=2) {
       ltBuffer[index] = outBuff[i];
@@ -86,7 +84,7 @@ static int initializePortAudio() {
   PaError err;
 
   err = Pa_Initialize();
-  if( err != paNoError ) goto error;
+  if (err != paNoError) goto error;
 
   /* Open an audio I/O stream. */
   err = Pa_OpenDefaultStream(
@@ -100,7 +98,7 @@ static int initializePortAudio() {
     nullptr
   );
 
-  if( err != paNoError ) goto error;
+  if (err != paNoError) goto error;
 
   return err;
 
@@ -181,7 +179,6 @@ void SoundManager::FreeArrayOfStrings(ArrayOfStrings *arrayOfStrings) {
 
 int SoundManager::LoadFile(char * filePath) {
   SoundManager::Stop();
-
 
   std::ifstream file(filePath, std::ios::binary);
 
@@ -327,26 +324,25 @@ void SoundManager::SetModPosition(int order) {
   }
 
   LockMutex();
-  modFile->set_position_order_row(order, 0);
+  if (modFile != nullptr) {
+    modFile->set_position_order_row(order, 0);
+  }
   UnlockMutex();
 };
 
 int SoundManager::Pause() {
   currentPlayMode = PLAY_MODE_PAUSED;
-  int result = Pa_StopStream(stream);
-  return result;
+  return Pa_StopStream(stream);
 }
 
 int SoundManager::Play() {
-  int result = Pa_StartStream(stream);
   currentPlayMode = PLAY_MODE_PLAYING;
-  return result;
+  return Pa_StartStream(stream);;
 }
 
 int SoundManager::Stop() {
   currentPlayMode = PLAY_MODE_STOPPED;
-  int result = Pa_StopStream(stream);
-  return result;
+  return Pa_StopStream(stream);;
 }
 
 void SoundManager::SetVolume(int newVolume) {
@@ -383,16 +379,36 @@ int SoundManager::ShutDown() {
     free(buffers.right_buffer);
   }
 
+  if (modInfoObject.title != nullptr) {
+    free(modInfoObject.title);
+  }
+  if (modInfoObject.artist != nullptr) {
+    free(modInfoObject.artist);
+  }
+  if (modInfoObject.type != nullptr) {
+    free(modInfoObject.type);
+  }
+  if (modInfoObject.type_long != nullptr) {
+    free(modInfoObject.type_long);
+  }
+  if (modInfoObject.container != nullptr) {
+    free(modInfoObject.container);
+  }
+  if (modInfoObject.container_long != nullptr) {
+    free(modInfoObject.container_long);
+  }
+  if (modInfoObject.tracker != nullptr) {
+    free(modInfoObject.tracker);
+  }
+  if (modInfoObject.date != nullptr) {
+    free(modInfoObject.date);
+  }
+  if (modInfoObject.message != nullptr) {
+    free(modInfoObject.message);
+  }
+  if (modInfoObject.warnings != nullptr) {
+    free(modInfoObject.warnings);
+  }
 
-  if (modInfoObject.title != nullptr) free(modInfoObject.title);
-  if (modInfoObject.artist != nullptr) free(modInfoObject.artist);
-  if (modInfoObject.type != nullptr) free(modInfoObject.type);
-  if (modInfoObject.type_long != nullptr) free(modInfoObject.type_long);
-  if (modInfoObject.container != nullptr) free(modInfoObject.container);
-  if (modInfoObject.container_long != nullptr) free(modInfoObject.container_long);
-  if (modInfoObject.tracker != nullptr) free(modInfoObject.tracker);
-  if (modInfoObject.date != nullptr) free(modInfoObject.date);
-  if (modInfoObject.message != nullptr) free(modInfoObject.message);
-  if (modInfoObject.warnings != nullptr) free(modInfoObject.warnings);
   return result;
 }

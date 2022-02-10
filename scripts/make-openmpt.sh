@@ -4,7 +4,7 @@
 set -e
 trap 'echo "exit $? due to $previous_command"' EXIT
 
-OPENMPT_LIB="libopenmpt-0.5.8+release.autotools"
+OPENMPT_LIB="libopenmpt-0.6.1+release.autotools"
 FRIENDLY_DIR="openmpt"
 LIB_DESTINATION_DIR="$(pwd)/../lib/lib/libopenmpt"
 mkdir -p $LIB_DESTINATION_DIR
@@ -43,7 +43,7 @@ cd ${FRIENDLY_DIR}
 
 
 ./configure --without-mpg123 --without-ogg --without-vorbis --without-sndfile \
-    --without-vorbisfile --without-portaudio --without-portaudiocpp --without-pulseaudio \
+    --without-vorbisfile --without-portaudio --without-portaudiocpp --without-pulseaudio --without-zlib \
     --without-flac --disable-doxygen-doc --disable-doxygen-html --disable-examples --disable-tests \
     --prefix=${LIB_DESTINATION_DIR} --exec-prefix=${LIB_DESTINATION_DIR}
 

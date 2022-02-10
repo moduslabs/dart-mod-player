@@ -7,11 +7,6 @@ struct ArrayOfStrings {
   int32_t numItems;
   char **items;
 
-  // Constructor, sets all of the items to null
-  // takes in numItems
-
-  // Create add method that appends
-
   void InitializeWithNumItems (int num_items)  {
     numItems = num_items;
 
@@ -31,16 +26,6 @@ struct ArrayOfStrings {
     items[index] = new char[strlen(item) + 1];
     strcpy(items[index], item);
   }
-};
-
-struct ArrayOfInt32s {
-  int32_t numItems;
-  int32_t *items;
-};
-
-struct ArrayOfDoubles {
-  int32_t numItems;
-  double *items;
 };
 
 struct StereoAudioBuffers {
@@ -79,5 +64,17 @@ struct ModInfo {
   int32_t bpm;
   double length;
 };
+
+
+struct ArrayOfInt32s {
+    int32_t numItems;
+    int32_t *items;
+};
+
+struct ArrayOfDoubles {
+    int32_t numItems;
+    double *items;
+};
+
 
 #endif //OPENMPT_LIBRARY_STRUCTS_H
