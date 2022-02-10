@@ -44,6 +44,9 @@ int shutdown() {
   return SoundManager::ShutDown();
 }
 
+void freeArrayOfStrings(ArrayOfStrings *arrayOfStrings) {
+  SoundManager::FreeArrayOfStrings(arrayOfStrings);
+}
 
 struct ArrayOfStrings get_pattern(int patternNum) {
   return SoundManager::GetPattern(patternNum);
